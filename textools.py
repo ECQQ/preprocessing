@@ -102,5 +102,5 @@ def equivalent_words(column):
     tree = KDTree(scores)
     dist, ind = tree.query(scores, k=2)
     print(dist)  
-
+    # Incomplete
     return column
