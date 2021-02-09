@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import difflib
 import nltk
 import re
 
@@ -94,13 +95,15 @@ def equivalent_words(column):
     values = column.values
 
     def get_score(word):
-        scores = [ord(letter) for letter in word]
+        scores = [(k+1)*ord(letter) for k, letter in enumerate(word)]
         return sum(scores)
 
-    scores = column.apply(lambda x: get_score(x))
-    
-    tree = KDTree(scores)
-    dist, ind = tree.query(scores, k=2)
-    print(dist)  
-    # Incomplete
+    new_values = []
+    for k, v in enumerate(values):
+        # here we can use Diego's dictonary
+        c = difflib.get_close_matches(v, 
+                                      values, 
+                                      n=2)
+        column.iloc[k] = c[-1]
+
     return column
