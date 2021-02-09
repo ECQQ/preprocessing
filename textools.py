@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import difflib
+import os.path
+import pickle
 import nltk
 import re
 
@@ -8,6 +10,10 @@ from nltk.corpus import stopwords
 from autocorrect import Speller
 from unidecode import unidecode
 from sklearn.neighbors import KDTree
+
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 
 
 nltk.download('stopwords')
@@ -102,8 +108,90 @@ def equivalent_words(column):
     for k, v in enumerate(values):
         # here we can use Diego's dictonary
         c = difflib.get_close_matches(v, 
-                                      values, 
+                                      values, # this should be changed 
                                       n=2)
         column.iloc[k] = c[-1]
 
     return column
+
+def remove_nans(frame):
+    """ Remove rows with nan values
+
+    Args:
+        frame (pandas Series or Dataframe): column(s)
+
+    Returns:
+        frame: the same data structure without nans
+    """
+    frame = frame.dropna()
+    return frame 
+
+
+def get_google_sheet(sheetid, rangex):
+    """Shows basic usage of the Sheets API.
+    Prints values from a sample spreadsheet.
+    """
+    # If modifying these scopes, delete the file token.pickle.
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
+
+    creds = None
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('sheets', 'v4', credentials=creds)
+
+    # Call the Sheets API
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=sheetid,
+                                range=rangex).execute()
+    values = result.get('values', [])
+    df = pd.DataFrame(values[1:], columns=values[0])
+    return df 
+
+
+def short_words(column):
+    """ Extract short words such as:
+    acronyms, abbreviations...
+    To use this method you need credentials
+    contact with Cristobal (cridonoso@inf.udec.cl)
+    if you need it
+    Args:
+        column (Serie): a column with words or sentences
+
+    Returns:
+        [list]: a list with short words detected
+    """
+    sheetid = '1vk3CPLCRZbToaqJQA1_4_1KeH9s2Lfi0cCz0hHewh9s'
+    masterdic = get_google_sheet(sheetid, 'A:C')
+    acronimos = masterdic[masterdic['clase'] == 'sigla']['palabra'].values
+
+    filter = r'[A-z | \.]+'
+    acron_detected = []
+    for cell in column:
+        cell = unidecode(str(cell))
+        # Lowercase
+        cell = cell.lower()
+
+        finds=re.findall(filter, cell)
+        finds = [f.replace('.', '') for f in finds]
+        finds = ' '.join(finds)
+
+        finds = [f.upper() for f in finds.split() if f.upper() in acronimos]
+        acron_detected += finds
+        
+    return acron_detected
