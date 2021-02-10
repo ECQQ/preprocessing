@@ -33,9 +33,14 @@ def run_pipeline():
         print('[INFO] {}/{}'.format(k, len(frame_cols)))
         if re.search(re_0, column):
             single_col = frame[column]
+            print('[INFO] Tokenize')
             single_col = tt.tokenize(single_col)
+            print('[INFO] Replace')
             frame = tt.replace_col(frame, single_col)
+            print('[INFO] New size: {}'.format(frame.shape))
+            print('[INFO] Check Speeling')
             single_col = tt.check_spelling(frame[column])
+            print('[INFO] Equivalent words')
             single_col = tt.equivalent_words(single_col)            
             frame[column] = single_col
         if k == 3 and opt.debug: break
