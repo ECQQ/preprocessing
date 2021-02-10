@@ -55,11 +55,13 @@ def process_one(row, k):
             
             final.columns = ['id_file', 'id_user', 'group', 'age', 'education', 'sex', 'priority', 'emotion']
             finals_df.append(final)
+    try:
+        finals_df = pd.concat(finals_df)
+    except:
+        pass
+
+    return finals_df
     
-    new_df = pd.concat(finals_df)
-    return new_df
-
-
 def run_pipeline():
 
     # Init Pipeline
@@ -80,6 +82,7 @@ def run_pipeline():
     allframes = Parallel(n_jobs=num_cores)(delayed(process_one)(row, k) \
                     for k, row in frame.iterrows())
 
+    allframes = [f for f in allframes if f != []]
     new_data = pd.concat(allframes, 0)
     new_data.to_csv('./datos/Dialogo/emo_per_user.csv', index=False)
 
