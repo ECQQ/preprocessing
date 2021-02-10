@@ -21,6 +21,7 @@ def process_one(row, k):
                 single_col = tt.tokenize(single_col)
                 words += single_col.values[0]
 
+            if len(words) < 1: continue 
             single_col = pd.Series(words)
             single_col = tt.check_spelling(single_col)
             single_col = tt.equivalent_words(single_col)                    
@@ -37,6 +38,8 @@ def process_one(row, k):
             id_file = row['ID Archivo']
             
             emo_serie = emotions[(~pd.isna(emotions)) & (emotions != 'nan')]
+
+
             emo_serie = emo_serie.reset_index()
             idu_serie = pd.Series([user_id]*len(emo_serie))
             age_serie = pd.Series([age]*len(emo_serie))
