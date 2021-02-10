@@ -21,11 +21,11 @@ def process_one(row, k):
                 single_col = tt.tokenize(single_col)
                 words += single_col.values[0]
 
-            if len(words) < 1: continue 
             single_col = pd.Series(words)
             single_col = tt.check_spelling(single_col)
             single_col = tt.equivalent_words(single_col)                    
-
+            
+            if single_col.shape[0] < 1: continue
             emotions = single_col
             person_id = re.search(r'\d+', m).group() 
             user_id = '{}_{}'.format(k, person_id)
