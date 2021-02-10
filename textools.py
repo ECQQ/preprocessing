@@ -18,6 +18,10 @@ from google.auth.transport.requests import Request
 
 nltk.download('stopwords')
 
+def to_unicode(column):
+    column = column.apply(lambda x: unidecode(str(x)).lower())
+    return column
+
 def tokenize(column):
     """ Tokenize a given column
     Args:
@@ -55,14 +59,16 @@ def replace_col(frame, column):
     """
     col_name = column.name
     col_indices = column.index.values
-
     new_frame = [frame.iloc[i]
-                   for i in col_indices\
-                   for v in column.iloc[i]]
+                 for i in col_indices\
+                 for _ in range(len(column.iloc[i]))]
+
+    new_values = [v for i in col_indices for v in column.iloc[i]]
+
     new_frame = pd.concat(new_frame, 1)
     new_frame = new_frame.transpose()
 
-    new_frame[col_name] = [vv for v in column for vv in v]
+    new_frame[col_name] = new_values  
     
     return new_frame
 
@@ -88,7 +94,7 @@ def check_spelling(column):
             column.iloc[i] = corr     
     return column
 
-def equivalent_words(column):
+def equivalent_words(column, values=None):
     """ Replace words by similarity.
     We calculate similarity by setting letter weights.
     This function works only on words (no sentences)
@@ -98,7 +104,7 @@ def equivalent_words(column):
     Returns:
         [Serie]: [the same column with similar words changed]
     """
-    values = column.values
+    values = column.values if values is None else values
 
     def get_score(word):
         scores = [(k+1)*ord(letter) for k, letter in enumerate(word)]
