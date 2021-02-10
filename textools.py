@@ -9,7 +9,6 @@ import re
 from nltk.corpus import stopwords
 from autocorrect import Speller
 from unidecode import unidecode
-from sklearn.neighbors import KDTree
 
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
