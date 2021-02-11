@@ -41,19 +41,22 @@ def process_one(row, k):
                 idu_serie = pd.Series([user_id]*len(emo_serie))
                 age_serie = pd.Series([age]*len(emo_serie))
                 sex_serie = pd.Series([sex]*len(emo_serie))
+                com_serie = pd.Series([comuna]*len(emo_serie))
                 lev_serie = pd.Series([level]*len(emo_serie))
                 grp_serie = pd.Series([group]*len(emo_serie))
                 idf_serie = pd.Series([id_file]*len(emo_serie))
                 
                 final = pd.concat([idf_serie, 
                                     idu_serie,
+                                    com_serie,
                                     grp_serie, 
                                     age_serie, 
                                     lev_serie, 
                                     sex_serie, 
                                     emo_serie], 1)
 
-                final.columns = ['id_file', 'id_user', 'group', 'age', 'education', 'sex', 'priority', 'emotion']
+                final.columns = ['id_file', 'id_user', 'comuna', 'group', 'age', 
+                                 'education', 'sex', 'priority', 'emotion']
                 finals_df.append(final)
 
     if len(finals_df)>1:
@@ -71,7 +74,7 @@ def run_pipeline():
     # Reading data
     comunas = pd.read_csv('./datos/comuna_region.csv', usecols=[0])
     if opt.debug:
-        chunksize = 100
+        chunksize = 10
         dialogos_df = pd.read_csv(opt.data, chunksize=chunksize, low_memory=False)
         for frame in dialogos_df: break
     else:
@@ -84,6 +87,10 @@ def run_pipeline():
 
     allframes = [f for f in allframes if f is not None]
     new_data = pd.concat(allframes, 0)
+
+    etiquetas = ['{}-{}'.format(n, n+5) for n in range(0, 100, 5)]
+
+    new_data['age_range'] = pd.cut(new_data['age'], range(0, 105, 5), right=False, labels=etiquetas)
     new_data.to_csv('./datos/Dialogo/emo_per_user.csv', index=False)
 
 if __name__ == '__main__':
