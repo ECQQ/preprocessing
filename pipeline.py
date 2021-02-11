@@ -9,6 +9,7 @@ from joblib import Parallel, delayed
 def process_one(row, k):
     re_0 = r'P1_\d_A'
     re_1 = r'LP_EDAD'
+    comunas_df = pd.read_csv('datos/comuna_region.csv')
     frame_cols  = [x for x in row.index if re.search(re_0, x)]
     member_cols = [x for x in row.index if re.search(re_1, x)]
     finals_df   = []
@@ -31,9 +32,15 @@ def process_one(row, k):
 
             comuna = row['LP_COMUNA{}'.format(person_id)]
             comuna = row['Comuna'] if pd.isna(comuna) else comuna 
+            comuna = tt.to_unicode(pd.Series(comuna)).values[0]
+            try:
+                region = comunas_df[comunas_df['Comuna'] == comuna]['Region'].values[0]
+            except:
+                region = -99
+
             sex = row['LP_SEXO{}'.format(person_id)]
-            level = row['LP_NIVEL{}'.format(person_id)]
-            group = row['Grupo']
+            level = tt.to_unicode(row['LP_NIVEL{}'.format(person_id)])
+            group = tt.to_unicode(row['Grupo'])
             id_file = row['ID Archivo']        
             emo_serie = emo_serie.reset_index()
 
@@ -42,20 +49,22 @@ def process_one(row, k):
                 age_serie = pd.Series([age]*len(emo_serie))
                 sex_serie = pd.Series([sex]*len(emo_serie))
                 com_serie = pd.Series([comuna]*len(emo_serie))
+                reg_serie = pd.Series([region]*len(emo_serie))
                 lev_serie = pd.Series([level]*len(emo_serie))
                 grp_serie = pd.Series([group]*len(emo_serie))
                 idf_serie = pd.Series([id_file]*len(emo_serie))
                 
                 final = pd.concat([idf_serie, 
-                                    idu_serie,
-                                    com_serie,
-                                    grp_serie, 
-                                    age_serie, 
-                                    lev_serie, 
-                                    sex_serie, 
-                                    emo_serie], 1)
+                                   idu_serie,
+                                   com_serie,
+                                   reg_serie,
+                                   grp_serie, 
+                                   age_serie, 
+                                   lev_serie, 
+                                   sex_serie, 
+                                   emo_serie], 1)
 
-                final.columns = ['id_file', 'id_user', 'comuna', 'group', 'age', 
+                final.columns = ['id_file', 'id_user', 'comuna', 'region', 'group', 'age', 
                                  'education', 'sex', 'priority', 'emotion']
                 finals_df.append(final)
 

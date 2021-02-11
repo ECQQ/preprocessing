@@ -18,8 +18,13 @@ from google.auth.transport.requests import Request
 nltk.download('stopwords')
 
 def to_unicode(column):
-    column = column.apply(lambda x: unidecode(str(x)).lower())
-    return column
+    if not isinstance(column, pd.Series):
+        column = pd.Series(column)
+        column = column.apply(lambda x: unidecode(str(x)).lower())
+        return column.values[0]
+    else:
+        column = column.apply(lambda x: unidecode(str(x)).lower())
+        return column
 
 def tokenize(column):
     """ Tokenize a given column
