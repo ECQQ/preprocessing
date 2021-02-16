@@ -98,8 +98,9 @@ def run_pipeline():
     new_data = pd.concat(allframes, 0)
 
     # 
-    etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 65, 15)]
-    new_data['age_range'] = pd.cut(new_data['age'], range(0, 65, 15), right=False, labels=etiquetas)
+    etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 60, 15)]
+    etiquetas += ['>= 60']
+    new_data['age_range'] = pd.cut(new_data['age'], range(0, 74, 15), right=False, labels=etiquetas)
     
     
     
