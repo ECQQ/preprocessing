@@ -99,8 +99,12 @@ def run_pipeline():
 
     # 
     etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 60, 15)]
-    etiquetas += ['>= 60']
-    new_data['age_range'] = pd.cut(new_data['age'], range(0, 74, 15), right=False, labels=etiquetas)
+    etiquetas += ['>=60']
+    range_values = [i for i in range(0, 61, 15)]
+    range_values.append(100)
+    print(etiquetas)
+    print(range_values)
+    new_data['age_range'] = pd.cut(new_data['age'], range_values, right=False, labels=etiquetas)
     
     
     
