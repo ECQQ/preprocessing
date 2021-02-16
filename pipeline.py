@@ -43,29 +43,21 @@ def process_one(row, k):
             group = tt.to_unicode(row['Grupo'])
             id_file = row['ID Archivo']        
             emo_serie = emo_serie.reset_index()
-
+            date_ = row['Fecha']  
+            date_init = row['Hora Inicio']  
+            date_end  = row['Hora Termino']  
+            
             if emo_serie.shape[0] > 1:
-                idu_serie = pd.Series([user_id]*len(emo_serie))
-                age_serie = pd.Series([age]*len(emo_serie))
-                sex_serie = pd.Series([sex]*len(emo_serie))
-                com_serie = pd.Series([comuna]*len(emo_serie))
-                reg_serie = pd.Series([region]*len(emo_serie))
-                lev_serie = pd.Series([level]*len(emo_serie))
-                grp_serie = pd.Series([group]*len(emo_serie))
-                idf_serie = pd.Series([id_file]*len(emo_serie))
+                final = []
+                for colp in [user_id, id_file, age, sex, comuna, region, 
+                            level, group, date_, date_init, date_end]:
                 
-                final = pd.concat([idf_serie, 
-                                   idu_serie,
-                                   com_serie,
-                                   reg_serie,
-                                   grp_serie, 
-                                   age_serie, 
-                                   lev_serie, 
-                                   sex_serie, 
-                                   emo_serie], 1)
-
-                final.columns = ['id_file', 'id_user', 'comuna', 'region', 'group', 'age', 
-                                 'education', 'sex', 'priority', 'emotion']
+                    serie = pd.Series([colp]*len(emo_serie))
+                    final.append(serie)
+                final.append(emo_serie)               
+                final = pd.concat(final, 1)
+                final.columns = ['id_user', 'id_file', 'age', 'sex', 'comuna', 'region', 'education', 'group', 
+                                'date', 'init_time', 'end_time', 'priority', 'emotion']
                 finals_df.append(final)
 
     if len(finals_df)>1:
@@ -102,8 +94,6 @@ def run_pipeline():
     etiquetas += ['>=60']
     range_values = [i for i in range(0, 61, 15)]
     range_values.append(100)
-    print(etiquetas)
-    print(range_values)
     new_data['age_range'] = pd.cut(new_data['age'], range_values, right=False, labels=etiquetas)
     
     
