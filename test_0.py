@@ -78,5 +78,29 @@ class TestPreprocessing(unittest.TestCase):
         r = textools.short_words(frame_0)
         self.assertTrue(r == ['AFP', 'AFP', 'AFP', 'AFP', 'FFAA', 'PSU'])
 
+    def test_combine_versions(self):
+        chunksize = 10
+        root = '/home/momo/Documents/ecqq/nuevos_datos'
+        frame1 = pd.read_csv(root+'/emo_per_user.csv', 
+                             chunksize=chunksize, 
+                             low_memory=False)
+        for frame_1 in frame1: break
+
+        frame2 = pd.read_csv(root+'/emo_per_user_v3.csv', 
+                                chunksize=chunksize, 
+                                low_memory=False)
+        for frame_2 in frame2: break
+
+        which = ['code_comuna', 
+                 'emotion_verified', 
+                 'emotion_verified2']
+        f = textools.combine_versions(frame_1, frame_2, on='id_user',
+                                  which=which)
+        
+        
+        self.assertTrue(which[0] in f.columns)
+        self.assertTrue(f.shape[0] == frame_1.shape[0])
+
+
 if __name__ == '__main__':
     unittest.main()

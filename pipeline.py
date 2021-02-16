@@ -65,52 +65,69 @@ def process_one(row, k):
         return finals_df
     else:
         return None
-    
-def run_pipeline():
 
+def clean_text(frame):
     # Init Pipeline
     num_cores = multiprocessing.cpu_count()
     print('[INFO] file: {} - {} CPU'.format(opt.data, num_cores))
-
-    # Reading data
     comunas = pd.read_csv('./datos/comuna_region.csv', usecols=[0])
-    if opt.debug:
-        chunksize = 10
-        dialogos_df = pd.read_csv(opt.data, chunksize=chunksize, low_memory=False)
-        for frame in dialogos_df: break
-    else:
-        frame = pd.read_csv(opt.data, low_memory=False)
-    
+
     # Regex patter to select some columns
-    
     allframes = Parallel(n_jobs=num_cores)(delayed(process_one)(row, k) \
                     for k, row in frame.iterrows())
 
     allframes = [f for f in allframes if f is not None]
     new_data = pd.concat(allframes, 0)
 
-    # 
+    # Stratify 
     etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 60, 15)]
     etiquetas += ['>=60']
     range_values = [i for i in range(0, 61, 15)]
     range_values.append(100)
     new_data['age_range'] = pd.cut(new_data['age'], range_values, right=False, labels=etiquetas)
-    
-    
-    
     new_data.to_csv('./nuevos_datos/emo_per_user.csv', index=False)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', type=str, default='c',
-                        help='options: (c)leaning ')
+                        help='options: (c)leaning - (j)oin')
     parser.add_argument('--path', type=str, default='./runs/test',
                         help='project path')
     parser.add_argument('--data', type=str, default='./datos/Dialogo/BBDD_dialogos_final.csv',
                         help='raw data directory')
+    parser.add_argument('--data2', type=str, default='',
+                    help='additional data to be joined with --data')
     parser.add_argument('--debug', action='store_true', 
                         help='debugger mode')
 
     opt = parser.parse_args()
+    
+    # Reading data
+    if opt.debug:
+        chunksize = 10
+        frame1 = pd.read_csv(opt.data, chunksize=chunksize, low_memory=False)
+        for frame_1 in frame1: break
+        if opt.data2 != '':
+            frame2 = pd.read_csv(opt.data2, chunksize=chunksize, low_memory=False)
+            for frame_2 in frame2: break
+    else:
+        frame_1 = pd.read_csv(opt.data, low_memory=False)
+        if opt.data2 != '':
+            frame_2 = pd.read_csv(opt.data2, low_memory=False)
 
-    run_pipeline()
+    if opt.mode == 'c':
+        clean_text(frame_1, frame_2)
+
+    if opt.mode == 'j':
+        which = ['code_comuna', 
+                 'emotion_verified', 
+                 'emotion_verified2']
+
+        frame_3 = tt.combine_versions(frame_1, frame_2, 
+                                      on='id_user', which=which)
+        
+
+        frame_3.to_csv('./nuevos_datos/emo_per_user_v4.csv', index=False)       
+
+        frame_4  = frame_3.sample(n=1000)
+        frame_4.to_csv('./nuevos_datos/emo_per_user_v4_tiny.csv', index=False)

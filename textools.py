@@ -205,3 +205,20 @@ def short_words(column):
         acron_detected += finds
         
     return acron_detected
+
+def combine_versions(frame1, frame2, on='id_user', which=None):
+
+    if which is not None:
+        frame2 = frame2[[on]+which]
+
+    if frame1.shape[0] != frame2.shape[0]:
+        print('[WARNING] Dataframes have not equal size.')
+
+    frame1 = frame1.set_index(on)
+    frame2 = frame2.set_index(on)
+
+    result = pd.concat([frame1, frame2], axis=1)
+
+    result.reset_index(level=0, inplace=True)
+
+    return result
