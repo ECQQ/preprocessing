@@ -97,13 +97,13 @@ def run_pipeline():
     allframes = [f for f in allframes if f is not None]
     new_data = pd.concat(allframes, 0)
 
-    # https://www.ine.cl/estadisticas/sociales/ingresos-y-gastos/encuesta-de-presupuestos-familiares
+    # 
     etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 65, 15)]
     new_data['age_range'] = pd.cut(new_data['age'], range(0, 65, 15), right=False, labels=etiquetas)
     
     
     
-    new_data.to_csv('./datos/Dialogo/emo_per_user.csv', index=False)
+    new_data.to_csv('./nuevos_datos/emo_per_user.csv', index=False)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
