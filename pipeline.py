@@ -38,8 +38,8 @@ def process_one(row, k):
             except:
                 region = -99
 
-            sex = row['LP_SEXO{}'.format(person_id)]
-            level = tt.to_unicode(row['LP_NIVEL{}'.format(person_id)])
+            sex = row['LP_COD_SEXO_P{}'.format(person_id)]
+            level = tt.to_unicode(row['LP_COD_NIVEL_P{}'.format(person_id)])
             group = tt.to_unicode(row['Grupo'])
             id_file = row['ID Archivo']        
             emo_serie = emo_serie.reset_index()
