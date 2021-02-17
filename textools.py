@@ -24,7 +24,7 @@ def to_unicode(column):
         return column.values[0]
     else:
         column = column.apply(lambda x: unidecode(str(x)).lower())
-        return column
+        return column 
 
 def tokenize(column):
     """ Tokenize a given column
@@ -89,13 +89,15 @@ def check_spelling(column):
     spell = Speller(lang='es')
     
     for i, cell in enumerate(column):
-        if ' ' in cell:
-            # by sentence case
-            pass
+        if isinstance(cell, list):
+            corr = []
+            for w in cell:
+                w_corr = spell(w)
+                corr.append(w_corr)
         else:
             # by word case
             corr = spell(cell)
-            column.iloc[i] = corr     
+        column.iloc[i] = corr     
     return column
 
 def equivalent_words(column, values=None):
@@ -110,17 +112,23 @@ def equivalent_words(column, values=None):
     """
     values = column.values if values is None else values
 
-    def get_score(word):
-        scores = [(k+1)*ord(letter) for k, letter in enumerate(word)]
-        return sum(scores)
-
+    all_values = [vv for v in values for vv in v]
     new_values = []
     for k, v in enumerate(values):
-        # here we can use Diego's dictonary
-        c = difflib.get_close_matches(v, 
-                                      values, # this should be changed 
-                                      n=2)
-        column.iloc[k] = c[-1]
+        if isinstance(v, list):
+            words = []
+            for w in v:
+                c = difflib.get_close_matches(w, 
+                            all_values, # this should be changed 
+                            n=2)
+                words.append(c[0])
+            column.iloc[k] = words
+        else:
+            # here we can use Diego's dictonary
+            c = difflib.get_close_matches(v, 
+                                        values, # this should be changed 
+                                        n=2)
+            column.iloc[k] = c[-1]
 
     return column
 
@@ -222,3 +230,12 @@ def combine_versions(frame1, frame2, on='id_user', which=None):
     result.reset_index(level=0, inplace=True)
 
     return result
+
+def stratify_frame_by_age(frame):
+    # Stratify 
+    etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 60, 15)]
+    etiquetas += ['>=60']
+    range_values = [i for i in range(0, 61, 15)]
+    range_values.append(100)
+    frame['age_range'] = pd.cut(frame['age'], range_values, right=False, labels=etiquetas)
+    return frame
