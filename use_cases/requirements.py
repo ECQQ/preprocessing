@@ -36,7 +36,9 @@ def process_one(row, k):
             req_serie_text  = text_response[(~pd.isna(text_response)) & (text_response != 'nan')]
             req_serie_token = token_response[(~pd.isna(token_response)) & (token_response != 'nan')]
             # GETTING IDS FOR ADDING TO OLD DATAGRTAMES
-            user_id   = re.search(r'\d+', m).group() 
+            person_id   = re.search(r'\d+', m).group() 
+            user_id = '{}_{}'.format(k, person_id)
+
             id_file   = row['ID Archivo'] 
             # AT LEAST ONE ANSWER
             if req_serie_token.shape[0] > 1:

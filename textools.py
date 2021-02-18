@@ -219,6 +219,7 @@ def combine_versions(frame1, frame2, on='id_user', which=None):
     if which is not None:
         frame2 = frame2[[on]+which]
 
+    print(frame2)
     if frame1.shape[0] != frame2.shape[0]:
         print('[WARNING] Dataframes have not equal size.')
 

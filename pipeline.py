@@ -83,8 +83,6 @@ if __name__ == '__main__':
     # ================ JOIN MODE ===============
     # ==========================================
     if opt.mode == 'j':
-        which = ['code_comuna', 
-                 'emotion_verified', 
-                 'emotion_verified2']
+        which = ['req_text', 'req_token']
 
         join_frames(frame_1, frame_2, which)
