@@ -5,6 +5,8 @@ import argparse
 
 from joblib import Parallel, delayed
 
+from use_cases.emotions import process_emotions
+
 
 def clean_text(frame):
     # Init Pipeline
@@ -12,26 +14,11 @@ def clean_text(frame):
     print('[INFO] file: {} - {} CPU'.format(opt.data, num_cores))
 
     if opt.question == 'P1':
-        from use_cases.emotions import process_one
+        process_emotions(frame)
+
     if opt.question == 'P5':
-        from use_cases.contributions import process_one
+        pass
 
-    # RUN SCRIPT FOR EACH SURVEY
-    allframes = Parallel(n_jobs=num_cores)(delayed(process_one)(row, k) \
-                    for k, row in frame.iterrows())
-
-    # FILTERING NAN VALUES
-    allframes = [f for f in allframes if f is not None]
-
-    # CONCATENATE ALL FRAMES
-    new_data = pd.concat(allframes, 0)
-
-    # IF EXIST AGES THEN STRATIFY THEM
-    if 'age' in new_data.columns:
-        new_data = tt.stratify_frame_by_age(new_data)
-
-    # SAVE NEW FRAME
-    new_data.to_csv('./nuevos_datos/{}.csv'.format(opt.output), index=False)
 
 def join_frames(frame_1, frame_2, which=[]):
     # COMBINE FRAMES BY 'ID_USER' COLUMN

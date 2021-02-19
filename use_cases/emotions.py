@@ -38,7 +38,7 @@ def get_members_info(row, max_member=30):
     Returns:
         [pandas Serie]: Pandas dataframe with the collected information
     """
-    comunas_df = pd.read_csv('../datos/comuna_region.csv')
+    comunas_df = pd.read_csv('./datos/comuna_region.csv')
     info = []
     for i in range(1, max_member+1):
         age     = tt.check_nan(row['LP_EDAD{}'.format(i)])
@@ -127,7 +127,7 @@ def process_emotions(frame):
     emo_user = emo_user[['emo_id', 'person_id']]
 
     # Saving tables
-    emo_user.to_csv('../nuevos_datos/emo_user.csv', index=False)
-    emotions_concat.to_csv('../nuevos_datos/emotions.csv', index=False)
-    gmembers_concat.to_csv('../nuevos_datos/persons.csv', index=False)
-    ginfo_concat.to_csv('../nuevos_datos/dialogue.csv', index=False)
+    emo_user.to_csv('./nuevos_datos/emo_user.csv', index=False)
+    emotions_concat.to_csv('./nuevos_datos/emotions.csv', index=False)
+    gmembers_concat.to_csv('./nuevos_datos/persons.csv', index=False)
+    ginfo_concat.to_csv('./nuevos_datos/dialogue.csv', index=False)
