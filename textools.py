@@ -240,3 +240,14 @@ def stratify_frame_by_age(frame):
     range_values.append(100)
     frame['age_range'] = pd.cut(frame['age'], range_values, right=False, labels=etiquetas)
     return frame
+
+def check_nan(condition, when_nan='NR'):
+    try:
+        if isinstance(condition, pd.Series):
+            response = condition.values[0]
+        else:
+            response = 'NR' if (condition=='nan' or pd.isna(condition)) else condition
+    except Exception as e:
+        response = 'NR'
+    return response
+    
