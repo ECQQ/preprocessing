@@ -2,6 +2,7 @@ import multiprocessing
 import textools as tt
 import pandas as pd
 import argparse
+import time
 
 from joblib import Parallel, delayed
 
@@ -55,6 +56,7 @@ if __name__ == '__main__':
     # ==========================================
     # ============== READING DATA ==============
     # ==========================================
+    t0 = time.time()
     if opt.debug:
         # debug option - smaller dataframe
         chunksize = 10
@@ -81,3 +83,7 @@ if __name__ == '__main__':
     if opt.mode == 'j':
         which = ['req_text', 'req_token']
         join_frames(frame_1, frame_2, which)
+
+    t1 = time.time()
+    total = t1-t0
+    print('[INFO] elapsed time: {:.2f} sec'.format(total))
