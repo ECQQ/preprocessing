@@ -161,7 +161,7 @@ def process_emotions(frame):
     user_emotion['emo_id'] = emo_indices
     user_emotion['file_id'] = grp_indices
     emo_user = pd.merge(user_emotion, gmembers_concat, on=['file_id'])
-    emo_user = emo_user[['emo_id', 'person_id']]
+    emo_user = emo_user[['emo_id', 'person_id', 'file_id']]
     print('4: ', time.time()-t0)
     
     # Saving tables
