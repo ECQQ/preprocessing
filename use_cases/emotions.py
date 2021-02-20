@@ -130,7 +130,7 @@ def process_emotions(frame):
     ginfo_concat.columns = ['diag_id', 'file_id', 'date', 'init_time', 'end_time', 
                             'location', 'address', 'comuna', 'region', 'n_members', 'group_name']
     print('1: ', time.time()-t0)
-    print(gmembers_concat)
+
     # Replace equivalent emotions
     t0 = time.time()
     emotions_concat = tt.equivalent_words(emotions_concat, num_cores=1)
