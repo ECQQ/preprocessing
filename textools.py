@@ -1,3 +1,4 @@
+import multiprocessing
 import pandas as pd
 import numpy as np
 import difflib
@@ -6,6 +7,7 @@ import pickle
 import nltk
 import re
 
+from joblib import Parallel, delayed
 from nltk.corpus import stopwords
 from autocorrect import Speller
 from unidecode import unidecode
@@ -100,7 +102,7 @@ def check_spelling(column):
         column.iloc[i] = corr     
     return column
 
-def equivalent_words(column, values=None):
+def equivalent_words(column, values=None, num_cores=None):
     """ Replace words by similarity.
     We calculate similarity by setting letter weights.
     This function works only on words (no sentences)
@@ -110,11 +112,13 @@ def equivalent_words(column, values=None):
     Returns:
         [Serie]: [the same column with similar words changed]
     """
+    num_cores = multiprocessing.cpu_count() if num_cores is None else num_cores
     values = column.values if values is None else values
 
     all_values = [vv for v in values for vv in v]
     new_values = []
-    for k, v in enumerate(values):
+
+    def step(k, v):
         if isinstance(v, list):
             words = []
             for w in v:
@@ -122,14 +126,18 @@ def equivalent_words(column, values=None):
                             all_values, # this should be changed 
                             n=2)
                 words.append(c[0])
-            column.iloc[k] = words
+            return words
+
         else:
             # here we can use Diego's dictonary
             c = difflib.get_close_matches(v, 
                                         values, # this should be changed 
                                         n=2)
-            column.iloc[k] = c[-1]
+            return c[-1]
 
+    equivalents = Parallel(n_jobs=num_cores)(delayed(step)(k, v) \
+                    for k, v in enumerate(values))
+    column.iloc[:] = equivalents
     return column
 
 def remove_nans(frame):
