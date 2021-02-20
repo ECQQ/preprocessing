@@ -8,6 +8,8 @@ from joblib import Parallel, delayed
 
 from use_cases.emotions import process_emotions
 
+from use_cases.contributions import process_contributions
+
 
 def clean_text(frame):
     # Init Pipeline
@@ -18,7 +20,7 @@ def clean_text(frame):
         process_emotions(frame)
 
     if opt.question == 'P5':
-        pass
+        process_contributions(frame)
 
 
 def join_frames(frame_1, frame_2, which=[]):
