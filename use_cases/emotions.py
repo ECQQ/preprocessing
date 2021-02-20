@@ -133,7 +133,7 @@ def process_emotions(frame):
 
     # Replace equivalent emotions
     t0 = time.time()
-    emotions_concat = tt.equivalent_words(emotions_concat, num_cores=1)
+    emotions_concat = tt.equivalent_words(emotions_concat)
     emotions_concat = pd.DataFrame(emotions_concat[0].unique(), columns=['name'])    
     emotions_concat = emotions_concat.reset_index()
     emotions_concat = emotions_concat.rename(columns={'index': 'emo_id'})
