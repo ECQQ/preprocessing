@@ -74,8 +74,8 @@ def process_individuals():
         all_contrib_text += list(contribution.values)
         all_contrib_token += list(cont_token.values)
 
-        if k == 3: break
-        k+=1
+        # if k == 3: break
+        # k+=1
 
     df_0 = pd.DataFrame()
     df_0['raw'] = all_emotions
