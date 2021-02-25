@@ -74,12 +74,14 @@ def process_individuals():
         all_contrib_text += list(contribution.values)
         all_contrib_token += list(cont_token.values)
 
-        # if k == 3: break
-        # k+=1
+        if k == 3: break
+        k+=1
 
     df_0 = pd.DataFrame()
     df_0['raw'] = all_emotions
-    df_0['name'] = [x if len(x[0]) == 1 else 'NR' for x in all_emotions]
+    df_0['explanation'] = all_explanations
+    df_0['name'] = [x if not isinstance(x, list) else 'NR' for x in all_emotions]
+    df_0 = df_0.replace('nr', 'NR')
     df_0['macro'] = ['NR']*len(all_emotions)
     df_0 = df_0.reset_index()
     df_0 = df_0.rename(columns={'index':'emo_id'})
