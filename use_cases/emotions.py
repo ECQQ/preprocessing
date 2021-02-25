@@ -126,8 +126,8 @@ def process_emotions(frame):
     emotions_concat = pd.concat(emotions).reset_index().iloc[:, 1:]
     gmembers_concat = pd.concat(gmembers).reset_index().iloc[:, 1:].reset_index()
     gmembers_concat = gmembers_concat.rename(columns={'index': 'person_id'})
-    ginfo_concat    = pd.concat(ginfo, 1).reset_index().iloc[:, 1:].T.reset_index()
-    ginfo_concat.columns = ['diag_id', 'file_id', 'date', 'init_time', 'end_time', 
+    ginfo_concat    = pd.concat(ginfo, 1).reset_index().iloc[:, 1:].T
+    ginfo_concat.columns = ['file_id', 'date', 'init_time', 'end_time', 
                             'location', 'address', 'comuna', 'region', 'n_members', 'group_name']
     print('1: ', time.time()-t0)
 

@@ -48,7 +48,6 @@ def tokenize(column):
         # Remove stop words
         finds = [f for f in finds \
         if f not in stopwords.words('spanish')]
-
         return finds
 
     assert isinstance(column, pd.Series), \
@@ -113,9 +112,11 @@ def equivalent_words(column, values=None, num_cores=None):
         [Serie]: [the same column with similar words changed]
     """
     num_cores = multiprocessing.cpu_count() if num_cores is None else num_cores
-    values = column.values if values is None else values
+    
+    if values is None:
+        values = [vv for v in column.values for vv in v]
 
-    all_values = [vv for v in values for vv in v]
+
     new_values = []
 
     def step(k, v):
@@ -123,9 +124,13 @@ def equivalent_words(column, values=None, num_cores=None):
             words = []
             for w in v:
                 c = difflib.get_close_matches(w, 
-                            all_values, # this should be changed 
+                            values, # this should be changed 
                             n=2)
-                words.append(c[0])
+                if c == []:
+                    words.append(w)
+                else:
+                    words.append(c[0])
+
             return words
 
         else:
@@ -136,9 +141,11 @@ def equivalent_words(column, values=None, num_cores=None):
             return c[-1]
 
     equivalents = Parallel(n_jobs=num_cores)(delayed(step)(k, v) \
-                    for k, v in enumerate(values))
-    column.iloc[:] = equivalents
-    return column
+                    for k, v in enumerate(column.values))
+
+    df = pd.DataFrame()
+    df[column.name] = equivalents
+    return df
 
 def remove_nans(frame):
     """ Remove rows with nan values

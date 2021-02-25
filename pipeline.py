@@ -7,9 +7,8 @@ import time
 from joblib import Parallel, delayed
 
 from use_cases.emotions import process_emotions
-
 from use_cases.contributions import process_contributions
-
+from use_cases.individuals import process_individuals
 
 def clean_text(frame):
     # Init Pipeline
@@ -21,6 +20,10 @@ def clean_text(frame):
 
     if opt.question == 'P5':
         process_contributions(frame)
+
+    # Individuals
+    if opt.question == 'I':
+        process_individuals()
 
 
 def join_frames(frame_1, frame_2, which=[]):
@@ -39,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--mode', type=str, default='c',
                         help='options: (c)leaning - (j)oin')
     parser.add_argument('--question', type=str, default='P1',
-                        help='Question to be proccesed (P1 - P5)')
+                        help='Question to be proccesed (P1 - P5 - (I)ndividual')
     parser.add_argument('--data', type=str, default='./datos/Dialogo/BBDD_dialogos_final.csv',
                         help='raw data directory')              
     parser.add_argument('--output', type=str, default='emo_per_user',
