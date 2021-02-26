@@ -48,6 +48,8 @@ def tokenize(column):
         # Remove stop words
         finds = [f for f in finds \
         if f not in stopwords.words('spanish')]
+        if finds == ['nr'] or finds == []:
+            finds = 'NR'
         return finds
 
     assert isinstance(column, pd.Series), \
@@ -114,7 +116,7 @@ def equivalent_words(column, values=None, num_cores=None):
     num_cores = multiprocessing.cpu_count() if num_cores is None else num_cores
     
     if values is None:
-        values = [vv for v in column.values for vv in v]
+        values = [v for v in column.values]
 
 
     new_values = []

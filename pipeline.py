@@ -8,7 +8,7 @@ from joblib import Parallel, delayed
 
 from use_cases.emotions import process_emotions
 from use_cases.contributions import process_contributions
-from use_cases.individuals import process_individuals
+from use_cases.individuals2 import process_individuals
 
 def clean_text(frame):
     # Init Pipeline
