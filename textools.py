@@ -19,6 +19,7 @@ from google.auth.transport.requests import Request
 
 nltk.download('stopwords')
 
+
 def to_unicode(column):
     if not isinstance(column, pd.Series):
         column = pd.Series(column)
@@ -48,7 +49,7 @@ def tokenize(column):
         # Remove stop words
         finds = [f for f in finds \
         if f not in stopwords.words('spanish')]
-        if finds == ['nr'] or finds == []:
+        if finds == ['nr'] or finds == [] or finds==['nan']:
             finds = 'NR'
         return finds
 
@@ -117,9 +118,6 @@ def equivalent_words(column, values=None, num_cores=None):
     
     if values is None:
         values = [v for v in column.values]
-
-
-    new_values = []
 
     def step(k, v):
         if isinstance(v, list):

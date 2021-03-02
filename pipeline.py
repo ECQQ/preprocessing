@@ -8,16 +8,19 @@ from joblib import Parallel, delayed
 
 from use_cases.emotions import process_emotions
 from use_cases.contributions import process_contributions
-from use_cases.individuals2 import process_individuals
+from use_cases.individuals import process_individuals
+from use_cases.needs import process_needs
 
 def clean_text(frame):
     # Init Pipeline
     num_cores = multiprocessing.cpu_count()
     print('[INFO] file: {} - {} CPU'.format(opt.data, num_cores))
 
+    # Emotions
     if opt.question == 'P1':
         process_emotions(frame)
 
+    # Contributions
     if opt.question == 'P5':
         process_contributions(frame)
 
@@ -25,6 +28,9 @@ def clean_text(frame):
     if opt.question == 'I':
         process_individuals()
 
+    # Needs dialogues
+    if opt.question == 'P4':
+        process_needs(frame)
 
 def join_frames(frame_1, frame_2, which=[]):
     # COMBINE FRAMES BY 'ID_USER' COLUMN
