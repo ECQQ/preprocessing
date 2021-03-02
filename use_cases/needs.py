@@ -54,12 +54,12 @@ def process_one(row, k):
             tuples.append([fide, need, otro, rol_otro])
 
     df = pd.DataFrame(np.array(tuples), 
-            columns=['file_id', 'need', 'actor', 'rol'])
-    df = df[df['need'] != 'nan']
-    df = df[~df['need'].isna()]
-    df['need'] = tt.check_spelling(df['need'])
+            columns=['file_id', 'name', 'actor', 'role'])
+    df = df[df['name'] != 'nan']
+    df = df[~df['name'].isna()]
+    df['name'] = tt.check_spelling(df['name'])
     df['actor'] = tt.equivalent_words(df['actor'])
-    df['rol_token'] = tt.tokenize(df['rol'])
+    df['role_token'] = tt.tokenize(df['role'])
     df = df.replace({'nan':'NR'})
     return df
     
@@ -73,5 +73,25 @@ def process_needs(frame):
 
     needs = pd.concat(allframes)
     needs['need_id'] = range(0, needs.shape[0])
-    needs['rol_token'] = tt.equivalent_words(needs['rol_token'])
+    needs['macro'] = needs['name'] 
+    needs['role_token'] = tt.equivalent_words(needs['role_token'])
     needs.to_csv('./nuevos_datos/dialogues/needs.csv', index=False)
+
+
+    persons = pd.read_csv('./nuevos_datos/dialogues/persons.csv')
+
+    persons = persons[['person_id', 'file_id']]
+
+
+    ids_1, ids_2 = [], []
+    for k, p in persons.iterrows():
+        particular = needs[needs['file_id'] == p['file_id']]['need_id']
+        
+        ids_1+=[p['person_id']]*len(particular)
+        ids_2+=list(particular.values)
+
+
+    intermidiate = pd.DataFrame()
+    intermidiate['person_id'] = ids_1
+    intermidiate['need_id'] = ids_2
+    intermidiate.to_csv('./nuevos_datos/dialogues/persons_needs.csv')
