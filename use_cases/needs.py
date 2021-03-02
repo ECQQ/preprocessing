@@ -34,9 +34,9 @@ def process_one(row, k):
         if '-' in rol_estado:
             roles_estado = rol_estado.split('-')
             for r in roles_estado:
-                tuples.append([fide, need, 'state', r])
+                tuples.append([fide, need, 'estado', r])
         else:
-            tuples.append([fide, need, 'state', rol_estado])
+            tuples.append([fide, need, 'estado', rol_estado])
 
         otro = tt.to_unicode(otro)
         otro = re.sub(r'\W+', ' ', otro)
