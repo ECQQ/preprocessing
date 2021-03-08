@@ -2,3 +2,4 @@ tensorflow
 pandas 
 joblib
 transformers
+tensorflow_addons

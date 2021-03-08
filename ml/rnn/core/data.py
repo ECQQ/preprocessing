@@ -47,7 +47,7 @@ def load_records(source, batch_size, return_cls=False):
             lambda x: _parse(x, n_cls), num_parallel_calls=8) for dataset in datasets
     ]
    
-    datasets = [dataset.repeat() for dataset in datasets]
+    # datasets = [dataset.repeat() for dataset in datasets]
     datasets = [dataset.shuffle(1000, reshuffle_each_iteration=True) for dataset in datasets]
     dataset  = tf.data.experimental.sample_from_datasets(datasets)
     dataset  = dataset.cache()
