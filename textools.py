@@ -1,3 +1,4 @@
+import multiprocessing
 import pandas as pd
 import numpy as np
 import difflib
@@ -6,6 +7,7 @@ import pickle
 import nltk
 import re
 
+from joblib import Parallel, delayed
 from nltk.corpus import stopwords
 from autocorrect import Speller
 from unidecode import unidecode
@@ -16,6 +18,7 @@ from google.auth.transport.requests import Request
 
 
 nltk.download('stopwords')
+
 
 def to_unicode(column):
     if not isinstance(column, pd.Series):
@@ -46,7 +49,8 @@ def tokenize(column):
         # Remove stop words
         finds = [f for f in finds \
         if f not in stopwords.words('spanish')]
-
+        if finds == ['nr'] or finds == [] or finds==['nan']:
+            finds = 'NR'
         return finds
 
     assert isinstance(column, pd.Series), \
@@ -100,7 +104,7 @@ def check_spelling(column):
         column.iloc[i] = corr     
     return column
 
-def equivalent_words(column, values=None):
+def equivalent_words(column, values=None, num_cores=None):
     """ Replace words by similarity.
     We calculate similarity by setting letter weights.
     This function works only on words (no sentences)
@@ -110,27 +114,38 @@ def equivalent_words(column, values=None):
     Returns:
         [Serie]: [the same column with similar words changed]
     """
-    values = column.values if values is None else values
+    num_cores = multiprocessing.cpu_count() if num_cores is None else num_cores
+    
+    if values is None:
+        values = [v for v in column.values]
 
-    all_values = [vv for v in values for vv in v]
-    new_values = []
-    for k, v in enumerate(values):
+    def step(k, v):
         if isinstance(v, list):
             words = []
             for w in v:
                 c = difflib.get_close_matches(w, 
-                            all_values, # this should be changed 
+                            values, # this should be changed 
                             n=2)
-                words.append(c[0])
-            column.iloc[k] = words
+                if c == []:
+                    words.append(w)
+                else:
+                    words.append(c[0])
+
+            return words
+
         else:
             # here we can use Diego's dictonary
             c = difflib.get_close_matches(v, 
                                         values, # this should be changed 
                                         n=2)
-            column.iloc[k] = c[-1]
+            return c[-1]
 
-    return column
+    equivalents = Parallel(n_jobs=num_cores)(delayed(step)(k, v) \
+                    for k, v in enumerate(column.values))
+
+    df = pd.DataFrame()
+    df[column.name] = equivalents
+    return df
 
 def remove_nans(frame):
     """ Remove rows with nan values
@@ -240,3 +255,14 @@ def stratify_frame_by_age(frame):
     range_values.append(100)
     frame['age_range'] = pd.cut(frame['age'], range_values, right=False, labels=etiquetas)
     return frame
+
+def check_nan(condition, when_nan='NR'):
+    try:
+        if isinstance(condition, pd.Series):
+            response = condition.values[0]
+        else:
+            response = 'NR' if (condition=='nan' or pd.isna(condition)) else condition
+    except Exception as e:
+        response = 'NR'
+    return response
+    

@@ -7,7 +7,7 @@ import sys,os
 sys.path.append(os.path.realpath('..'))
 import textools 
 
-from use_cases import requirements as script
+from use_cases import emotions as script
 warnings.filterwarnings("ignore")
 
 class TestPreprocessing(unittest.TestCase):
@@ -38,10 +38,6 @@ class TestPreprocessing(unittest.TestCase):
         data = pd.read_csv(source, chunksize=chunksize)    
         for frame in data: break
 
-        for k, row in frame.iterrows():
-            df = script.process_one(row, k) 
-            print(df)
-            break
-
+        r = script.process_emotions(frame)
 if __name__ == '__main__':
     unittest.main()
