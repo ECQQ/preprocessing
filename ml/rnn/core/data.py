@@ -1,6 +1,10 @@
 import tensorflow as tf
 import os
 
+from transformers import glue_convert_examples_to_features
+from transformers import XLMTokenizer
+tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
+
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
     if isinstance(value, type(tf.constant(0))):
@@ -31,7 +35,6 @@ def _parse(sample):
 
     return ex1['text'], ex1['label']
 
-
 def load_records(source, batch_size):
 
     datasets = [tf.data.TFRecordDataset(os.path.join(source, x)) for x in os.listdir(source)]  
@@ -40,7 +43,7 @@ def load_records(source, batch_size):
         dataset.map(
             lambda x: _parse(x), num_parallel_calls=8) for dataset in datasets
     ]
-    
+   
     # datasets = [dataset.repeat() for dataset in datasets]
     datasets = [dataset.shuffle(1000, reshuffle_each_iteration=True) for dataset in datasets]
     dataset  = tf.data.experimental.sample_from_datasets(datasets)
