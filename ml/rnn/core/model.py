@@ -6,15 +6,16 @@ from tensorflow.keras.layers import (Input,
                                      StackedRNNCells, 
                                      RNN,
                                      Dense)
+from tensorflow_addons.rnn import LayerNormLSTMCell
 from tensorflow.keras import Model
 
 from core.masking import create_mask
 
 class RNNModel(Model):
-    def __init__(self, num_units, num_layers, num_cls, **kwargs):
+    def __init__(self, num_units, num_layers, num_cls, dropout, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
 
-        rnn_cells = [LSTMCell(num_units) for _ in range(num_layers)]
+        rnn_cells = [LayerNormLSTMCell(num_units, dropout=dropout) for _ in range(num_layers)]
         stacked_lstm = StackedRNNCells(rnn_cells)
         self.lstm_layer = RNN(stacked_lstm)
         self.dense = Dense(num_cls, activation='softmax')
@@ -29,7 +30,6 @@ class RNNModel(Model):
         x, mask = inputs
         x = self.lstm_layer(x, mask=mask, training=training)
         x = self.dense(x)
-
         return x 
 
     def train_step(self, data):
