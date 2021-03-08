@@ -33,17 +33,18 @@ def train_val_test_split(x, test_ptge=0.25, val_ptge=0.25):
 
     return (train, 'train'), (vali, 'val'), (test, 'test') 
 
+tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
+
 def process_sentence(text, label, dicmap):
     ex = None
     if len(text) > 2:
-        tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
         input_ids = tokenizer.encode(text)
 
         f = dict()
         f['text'] = _bytes_feature(text.encode('utf-8'))
         f['input'] = _float_feature(input_ids)
         f['label'] = _int64_feature(dicmap.index(label))
-        # f['length'] = _int64_feature(len(input_ids))
+        f['length'] = _int64_feature(len(input_ids))
         f['category'] = _bytes_feature(label.encode('utf-8'))
         ex = tf.train.Example(features=tf.train.Features(feature=f))
     return ex
