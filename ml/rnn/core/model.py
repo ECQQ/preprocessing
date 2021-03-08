@@ -8,6 +8,8 @@ from tensorflow.keras.layers import (Input,
                                      Dense)
 from tensorflow.keras import Model
 
+from core.masking import create_mask
+
 class RNNModel(Model):
     def __init__(self, num_units, num_layers, num_cls, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
@@ -31,29 +33,30 @@ class RNNModel(Model):
         return x 
 
     def train_step(self, data):
-        x, y_true = data
-
+        x, l, y_true = data
+        mask = create_mask(x, l)
         with tf.GradientTape() as tape:
-            y_pred = self(data, training=True)
+            y_pred = self((x, mask), training=True)
             t_loss = self.compiled_loss(y_true, y_pred)
             
         gradients = tape.gradient(t_loss, self.trainable_variables)    
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
-        self.compiled_metrics.update_state(inputs, output)
+        self.compiled_metrics.update_state(y_true, y_pred)
         return {m.name: m.result() for m in self.metrics}
 
     def test_step(self, data):
-        x, y_true = data
-
+        x, l, y_true = data
+        mask = create_mask(x, l)
         with tf.GradientTape() as tape:
-            y_pred = self(data, training=True)
+            y_pred = self((x, mask), training=True)
             t_loss = self.compiled_loss(y_true, y_pred)
             
-        self.compiled_metrics.update_state(inputs, output)
+        self.compiled_metrics.update_state(y_true, y_pred)
         return {m.name: m.result() for m in self.metrics}
     
     def predict_step(self, data):
-        x, y_true = data
-        y_pred = self(data, training=True)
-        self.compiled_metrics.update_state(inputs, output)
+        x, l, y_true = data
+        mask = create_mask(x, l)
+        y_pred = self((x, mask), training=True)
+        self.compiled_metrics.update_state(y_true, y_pred)
         return {m.name: m.result() for m in self.metrics}
