@@ -9,7 +9,7 @@ from core.callbacks import get_callbacks
 
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import Recall, CategoricalAccuracy
-from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.optimizers import RMSprop, Adam
 
 def train(opt):
     train_batches, n_cls = load_records(os.path.join(opt.data, 'train'), 
@@ -27,7 +27,7 @@ def train(opt):
 
     model.model(opt.batch_size).summary()
 
-    model.compile(optimizer=RMSprop(lr=opt.lr), 
+    model.compile(optimizer=Adam(lr=opt.lr), 
                   loss=CategoricalCrossentropy(), 
                   metrics=[Recall(), CategoricalAccuracy()])
 
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # ASTROMER HIPERPARAMETERS
     parser.add_argument('--layers', default=2, type=int,
                         help='Number of encoder layers')
-    parser.add_argument('--units', default=128, type=int,
+    parser.add_argument('--units', default=256, type=int,
                         help='Number of self-attention heads')
     parser.add_argument('--dropout', default=0.25, type=int,
                         help='Dropout applied to the output of the RNN')
