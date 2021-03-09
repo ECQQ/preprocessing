@@ -114,7 +114,7 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
 
     # Iterate over sentences
     for label, lab_frame in tqdm(grp_class):
-        response = Parallel(n_jobs=n_jobs)(delayed(process_sentence_lemma_bert)\
+        response = Parallel(n_jobs=n_jobs)(delayed(process_sentence_bert)\
                     (row, label, unique_classes) \
                     for k, row in lab_frame.iterrows())
 
@@ -126,5 +126,5 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
                 (subset, '{}/{}'.format(path, name), unique_classes.index(label)) \
                 for subset, name in splits)
 
-folder_destinity = './data/records/contrib_lemma_bert'
+folder_destinity = './data/records/contrib_bert'
 create_record(path=folder_destinity)

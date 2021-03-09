@@ -8,7 +8,7 @@ def get_callbacks(basepath='./experiments/test'):
     os.makedirs(basepath, exist_ok=True)
 
     earlystopping = EarlyStopping(monitor="val_loss",
-                                    patience=40,
+                                    patience=100,
                                     min_delta=1e-4,
                                     mode='min',
                                     restore_best_weights=True,

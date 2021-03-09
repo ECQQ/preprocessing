@@ -35,7 +35,7 @@ def _parse(sample, n_cls):
 
 
     inputs = tf.expand_dims(ex1['input'], 1)
-    return inputs, tf.cast(ex1['length'], tf.int32), tf.one_hot(ex1['label'], n_cls)
+    return inputs, tf.cast(ex1['length'], tf.int32), tf.one_hot(ex1['label'], n_cls), ex1['text'], ex1['category']
 
 def load_records(source, batch_size, return_cls=False):
 
