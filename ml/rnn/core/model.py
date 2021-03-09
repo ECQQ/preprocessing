@@ -45,7 +45,7 @@ class RNNModel(Model):
         return {m.name: m.result() for m in self.metrics}
 
     def test_step(self, data):
-        x, l, y_true = data
+        x, l, y_true, _, _ = data
         mask = create_mask(x, l)
         with tf.GradientTape() as tape:
             y_pred = self((x, mask), training=True)
@@ -55,7 +55,7 @@ class RNNModel(Model):
         return {m.name: m.result() for m in self.metrics}
     
     def predict_step(self, data):
-        x, l, y_true = data
+        x, l, y_true, _, _ = data
         mask = create_mask(x, l)
         y_pred = self((x, mask), training=True)
         self.compiled_metrics.update_state(y_true, y_pred)
