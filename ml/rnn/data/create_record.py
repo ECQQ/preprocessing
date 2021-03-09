@@ -16,7 +16,6 @@ stemmer = SnowballStemmer('spanish')
 tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
 
 frame_file = './data/contributions.csv'
-folder_destinity = './data/records/contrib_own_embbeding'
 
 def clean_alt_list(list_):
     list_ = list_.replace('[', '')
@@ -69,7 +68,6 @@ def process_sentence_bert(row, label, dicmap):
     text = row['text']
     if len(text) > 2:
         input_ids = tokenizer.encode(text)
-
         f = dict()
         f['text'] = _bytes_feature(text.encode('utf-8'))
         f['input'] = _float_feature(input_ids)
@@ -78,6 +76,22 @@ def process_sentence_bert(row, label, dicmap):
         f['category'] = _bytes_feature(label.encode('utf-8'))
         ex = tf.train.Example(features=tf.train.Features(feature=f))
     return ex
+
+def process_sentence_lemma_bert(row, label, dicmap):
+    ex = None
+    text = row['tokens']
+    text = [stemmer.stem(word) for word in text]
+    text = ''.join(text)
+    input_ids = tokenizer.encode(text)
+    f = dict()
+    f['text'] = _bytes_feature(text.encode('utf-8'))
+    f['input'] = _float_feature(input_ids)
+    f['label'] = _int64_feature(dicmap.index(label))
+    f['length'] = _int64_feature(len(input_ids))
+    f['category'] = _bytes_feature(label.encode('utf-8'))
+    ex = tf.train.Example(features=tf.train.Features(feature=f))
+    return ex
+
 
 def process_sentence_current_domain(row, label, dicmap):
     ex = None
@@ -100,7 +114,7 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
 
     # Iterate over sentences
     for label, lab_frame in tqdm(grp_class):
-        response = Parallel(n_jobs=n_jobs)(delayed(process_sentence_current_domain)\
+        response = Parallel(n_jobs=n_jobs)(delayed(process_sentence_lemma_bert)\
                     (row, label, unique_classes) \
                     for k, row in lab_frame.iterrows())
 
@@ -112,4 +126,5 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
                 (subset, '{}/{}'.format(path, name), unique_classes.index(label)) \
                 for subset, name in splits)
 
+folder_destinity = './data/records/contrib_lemma_bert'
 create_record(path=folder_destinity)
