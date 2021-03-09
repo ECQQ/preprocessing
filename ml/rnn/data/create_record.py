@@ -9,6 +9,30 @@ from joblib import Parallel, delayed
 from transformers import XLMTokenizer
 from tqdm import tqdm
 
+from nltk import word_tokenize
+from nltk.stem import SnowballStemmer
+stemmer = SnowballStemmer('spanish')
+
+tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
+
+frame_file = './data/contributions.csv'
+folder_destinity = './data/records/contrib_own_embbeding'
+
+def clean_alt_list(list_):
+    list_ = list_.replace('[', '')
+    list_ = list_.replace(']', '')
+    list_ = list_.replace("'", '')
+    list_ = list_.split(',')
+    
+    return list_
+
+
+# Reading data frame
+data = pd.read_csv(frame_file)
+data['tokens'] = data['tokens'].apply(clean_alt_list)
+data = data[data['resume']!='NR']
+unique_classes = list(data['resume'].unique())
+unique_words = list(np.unique([stemmer.stem(word) for tokens in data['tokens'] for word in tokens]))
 
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
@@ -33,10 +57,16 @@ def train_val_test_split(x, test_ptge=0.25, val_ptge=0.25):
 
     return (train, 'train'), (vali, 'val'), (test, 'test') 
 
-tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
+def write_record(subset, folder, filename):
+    # Creates a record file for a given subset of lightcurves
+    os.makedirs(folder, exist_ok=True)
+    with tf.io.TFRecordWriter('{}/{}.record'.format(folder, filename)) as writer:
+        for ex in subset:
+            writer.write(ex.SerializeToString())
 
-def process_sentence(text, label, dicmap):
+def process_sentence_bert(row, label, dicmap):
     ex = None
+    text = row['text']
     if len(text) > 2:
         input_ids = tokenizer.encode(text)
 
@@ -49,29 +79,30 @@ def process_sentence(text, label, dicmap):
         ex = tf.train.Example(features=tf.train.Features(feature=f))
     return ex
 
-def write_record(subset, folder, filename):
-    # Creates a record file for a given subset of lightcurves
-    os.makedirs(folder, exist_ok=True)
-    with tf.io.TFRecordWriter('{}/{}.record'.format(folder, filename)) as writer:
-        for ex in subset:
-            writer.write(ex.SerializeToString())
+def process_sentence_current_domain(row, label, dicmap):
+    ex = None
+    text = row['text']
+    input_ids = [unique_words.index(stemmer.stem(word)) for word in row['tokens']]
+    f = dict()
+    f['text'] = _bytes_feature(text.encode('utf-8'))
+    f['input'] = _float_feature(input_ids)
+    f['label'] = _int64_feature(dicmap.index(label))
+    f['length'] = _int64_feature(len(input_ids))
+    f['category'] = _bytes_feature(label.encode('utf-8'))
+    ex = tf.train.Example(features=tf.train.Features(feature=f))
+    return ex
 
-def create_record(file, path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None):  
+def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None):  
     n_jobs = mp.cpu_count() if n_jobs is not None else n_jobs
-
-    # Reading data frame
-    data = pd.read_csv(file)
-    data = data[data['resume']!='NR']
-    unique_classes = list(data['resume'].unique())
 
     # Group by category
     grp_class = data.groupby('resume')
 
     # Iterate over sentences
     for label, lab_frame in tqdm(grp_class):
-        response = Parallel(n_jobs=n_jobs)(delayed(process_sentence)\
-                    (text, label, unique_classes) \
-                    for text in lab_frame['text'])
+        response = Parallel(n_jobs=n_jobs)(delayed(process_sentence_current_domain)\
+                    (row, label, unique_classes) \
+                    for k, row in lab_frame.iterrows())
 
         response = [r for r in response if r is not None]
         splits = train_val_test_split(response, 
@@ -81,8 +112,4 @@ def create_record(file, path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs
                 (subset, '{}/{}'.format(path, name), unique_classes.index(label)) \
                 for subset, name in splits)
 
-
-
-frame_file = './data/contributions.csv'
-folder_destinity = './data/records/contributions'
-create_record(frame_file, path=folder_destinity)
+create_record(path=folder_destinity)
