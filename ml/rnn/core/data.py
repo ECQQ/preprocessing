@@ -46,11 +46,10 @@ def load_records(source, batch_size, return_cls=False):
         dataset.map(
             lambda x: _parse(x, n_cls), num_parallel_calls=8) for dataset in datasets
     ]
-   
+    
     # datasets = [dataset.repeat() for dataset in datasets]
     datasets = [dataset.shuffle(1000, reshuffle_each_iteration=True) for dataset in datasets]
     dataset  = tf.data.experimental.sample_from_datasets(datasets)
-    dataset  = dataset.cache()
     dataset  = dataset.padded_batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
     if return_cls:
         return dataset, n_cls
