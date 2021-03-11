@@ -50,7 +50,7 @@ def train(opt):
                   loss=loss, 
                   metrics=metrics)
 
-    model.fit(train_batches.take(1),
+    model.fit(train_batches,
               epochs=opt.epochs,
               callbacks=get_callbacks(opt.p),
               validation_data=val_batches)
@@ -77,16 +77,16 @@ if __name__ == '__main__':
                         help='Dataset folder containing the records files')
     parser.add_argument('--p', default="./experiments/test", type=str,
                         help='Proyect path. Here will be stored weights and metrics')
-    parser.add_argument('--batch-size', default=5, type=int,
+    parser.add_argument('--batch-size', default=64, type=int,
                         help='batch size')
-    parser.add_argument('--epochs', default=10, type=int,
+    parser.add_argument('--epochs', default=2000, type=int,
                         help='Number of epochs')
     # MODEL HIPERPARAMETERS
     parser.add_argument('--layers', default=2, type=int,
                         help='Number of encoder layers')
-    parser.add_argument('--units', default=16, type=int,
+    parser.add_argument('--units', default=128, type=int,
                         help='Number of units within the recurrent unit(s)')
-    parser.add_argument('--zdim', default=5, type=int,
+    parser.add_argument('--zdim', default=15, type=int,
                         help='Latent space dimensionality')
     parser.add_argument('--dropout', default=0.25, type=int,
                         help='Dropout applied to the output of the RNN')
