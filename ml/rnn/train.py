@@ -54,20 +54,20 @@ def train(opt):
               epochs=opt.epochs,
               callbacks=get_callbacks(opt.p),
               validation_data=val_batches)
-    # # Testing
-    # metrics = model.evaluate(test_batches)
+    # Testing
+    metrics = model.evaluate(test_batches)
 
-    # # Saving metrics and setup file
-    # os.makedirs(os.path.join(opt.p, 'test'), exist_ok=True)
-    # test_file = os.path.join(opt.p, 'test/test_metrics.json')
-    # with open(test_file, 'w') as json_file:
-    #     json.dump({'loss': metrics[0], 
-    #                'recall': metrics[1], 
-    #                'accuracy':metrics[2]}, json_file, indent=4)
+    # Saving metrics and setup file
+    os.makedirs(os.path.join(opt.p, 'test'), exist_ok=True)
+    test_file = os.path.join(opt.p, 'test/test_metrics.json')
+    with open(test_file, 'w') as json_file:
+        json.dump({'loss': metrics[0], 
+                   'recall': metrics[1], 
+                   'accuracy':metrics[2]}, json_file, indent=4)
 
-    # conf_file = os.path.join(opt.p, 'conf.json')
-    # with open(conf_file, 'w') as json_file:
-    #     json.dump(vars(opt), json_file, indent=4)
+    conf_file = os.path.join(opt.p, 'conf.json')
+    with open(conf_file, 'w') as json_file:
+        json.dump(vars(opt), json_file, indent=4)
 
 
 if __name__ == '__main__':
