@@ -24,13 +24,39 @@ def clean_alt_list(list_):
     list_ = list_.split(',')
     
     return list_
-
+    
+exchange = {'Participación Ciudadana':'Participacion', 
+            'Familia':'Reciprocidad-Redes', 
+            'Participación Electoral':'Participacion', 
+            'Protesta Social':'Protesta Social', 
+            'Reciprocidad-Redes':'Reciprocidad-Redes', 
+            'Sustentabilidad Ambiental':'Sustentabilidad Ambiental', 
+            'Compromiso con la Educación y Autoeducación':'Educación y autoeducación', 
+            'Difusión de la Información':'Educación y autoeducación', 
+            'Voluntariado':'Voluntariado', 
+            'Cultura':'Cultura', 
+            'Trabajo':'Trabajo', 
+            'Accountability':'Confianza en las instituciones', 
+            'Combatir Delincuencia':'Combatir Delincuencia', 
+            'Defensa de derechos':'Defensa de derechos', 
+            'Defensa de derechos, Inclusión y Diversidad':'Inclusión y Diversidad',
+            'Inclusión y Diversidad':'Inclusión y Diversidad', 
+            'Apoyo a Pueblos Originarios':'Inclusión y Diversidad', 
+            'Emprendimiento':'Trabajo', 
+            'Autocuidado y Salud':'Autocuidado y Salud', 
+            'Erradicar violencia contra la Mujer':'Erradicar violencia contra la Mujer', 
+            'Tenencia Responsable':'Tenencia Responsable', 
+            'Confiar en la Institucionalidad':'Confianza en las instituciones'}
 
 # Reading data frame
 data = pd.read_csv(frame_file)
 data['tokens'] = data['tokens'].apply(clean_alt_list)
 data = data[data['resume']!='NR']
+
+data['resume'] = data['resume'].apply(lambda x: exchange[x])
+
 unique_classes = list(data['resume'].unique())
+
 unique_words = list(np.unique([stemmer.stem(word) for tokens in data['tokens'] for word in tokens]))
 
 def _bytes_feature(value):
@@ -126,5 +152,5 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
                 (subset, '{}/{}'.format(path, name), unique_classes.index(label)) \
                 for subset, name in splits)
 
-folder_destinity = './data/records/contrib_bert'
+folder_destinity = './data/records/contrib_bert_2'
 create_record(path=folder_destinity)
