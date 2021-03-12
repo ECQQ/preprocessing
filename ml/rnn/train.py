@@ -41,7 +41,7 @@ def train(opt):
                          num_cls=n_cls, 
                          dropout=opt.dropout)
         loss = CategoricalCrossentropy()
-        metrics = [CustomAccuracy()]
+        metrics = [Recall(), CustomAccuracy()]
 
 
     model.model(opt.batch_size).summary()

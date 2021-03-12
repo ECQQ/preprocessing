@@ -83,7 +83,7 @@ class RAE(Model):
         x, l, y_true, _, _ = data
         mask = create_mask(x, l)
         with tf.GradientTape() as tape:
-            y_pred = self((x, mask), training=True)
+            y_pred = self((x, mask), training=False)
             y_true = tf.concat([x, tf.cast(tf.expand_dims(mask, 2), dtype=tf.float32)], 2)
             t_loss = self.compiled_loss(y_true, y_pred)
             
@@ -93,7 +93,7 @@ class RAE(Model):
     def predict_step(self, data):
         x, l, y_true, _, _ = data
         mask = create_mask(x, l)
-        y_pred = self((x, mask), training=True)
+        y_pred = self((x, mask), training=False)
         y_true = tf.concat([x, tf.cast(tf.expand_dims(mask, 2), dtype=tf.float32)], 2)
         self.compiled_metrics.update_state(y_true, y_pred)
         return {m.name: m.result() for m in self.metrics}
