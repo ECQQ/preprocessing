@@ -8,7 +8,7 @@ from core.model import RNNModel
 from core.ae import RAE
 from core.callbacks import get_callbacks
 from core.losses import MaskedCrossEntropy
-from core.metrics import MaskedACC
+from core.metrics import MaskedACC, CustomAccuracy
 
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import Recall, CategoricalAccuracy
@@ -29,7 +29,7 @@ def train(opt):
     if opt.model == 'ae':
         model = RAE(num_units=opt.units, 
                     num_layers=opt.layers, 
-                    voc_size=tokenizer.vocab_size, 
+                    voc_size=opt.vocab_size, 
                     zdim=opt.zdim,
                     dropout=opt.dropout)
         loss = MaskedCrossEntropy()
@@ -41,7 +41,7 @@ def train(opt):
                          num_cls=n_cls, 
                          dropout=opt.dropout)
         loss = CategoricalCrossentropy()
-        metrics = [Recall(), CategoricalAccuracy()]
+        metrics = [CustomAccuracy()]
 
 
     model.model(opt.batch_size).summary()
@@ -73,12 +73,14 @@ def train(opt):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # TRAINING PAREMETERS
-    parser.add_argument('--data', default='./data/records/contrib_bert_2/', type=str,
+    parser.add_argument('--data', default='./data/records/contrib_bert_3/', type=str,
                         help='Dataset folder containing the records files')
     parser.add_argument('--p', default="./experiments/test", type=str,
                         help='Proyect path. Here will be stored weights and metrics')
     parser.add_argument('--batch-size', default=64, type=int,
                         help='batch size')
+    parser.add_argument('--vocab_size', default=tokenizer.vocab_size, type=int,
+                        help='vocabulary size')
     parser.add_argument('--epochs', default=2000, type=int,
                         help='Number of epochs')
     # MODEL HIPERPARAMETERS

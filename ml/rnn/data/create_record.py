@@ -60,6 +60,8 @@ unique_classes = list(data['resume'].unique())
 
 unique_words = list(np.unique([stemmer.stem(word) for tokens in data['tokens'] for word in tokens]))
 
+print('[VOCABSIZE]', len(unique_words))
+
 def _bytes_feature(value):
     """Returns a bytes_list from a string / byte."""
     if isinstance(value, type(tf.constant(0))):
