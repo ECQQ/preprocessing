@@ -15,7 +15,7 @@ stemmer = SnowballStemmer('spanish')
 
 tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
 
-frame_file = './data/contributions.csv'
+frame_file = './data/cont_no_nr.csv'
 
 def clean_alt_list(list_):
     list_ = list_.replace('[', '')
@@ -25,7 +25,8 @@ def clean_alt_list(list_):
     
     return list_
     
-exchange = {'Participación Ciudadana':'Participacion', 
+exchange = {'Participacion':'Participacion',
+            'Participación Ciudadana':'Participacion', 
             'Familia':'Reciprocidad-Redes', 
             'Participación Electoral':'Participacion', 
             'Protesta Social':'Protesta Social', 
@@ -45,7 +46,7 @@ exchange = {'Participación Ciudadana':'Participacion',
             'Emprendimiento':'Trabajo', 
             'Autocuidado y Salud':'Autocuidado y Salud', 
             'Erradicar violencia contra la Mujer':'Erradicar violencia contra la Mujer', 
-            'Tenencia Responsable':'Tenencia Responsable', 
+            'Tenencia Responsable':'Sustentabilidad Ambiental', 
             'Confiar en la Institucionalidad':'Confianza en las instituciones'}
 
 # Reading data frame
@@ -53,7 +54,7 @@ data = pd.read_csv(frame_file)
 data['tokens'] = data['tokens'].apply(clean_alt_list)
 data = data[data['resume']!='NR']
 
-data['resume'] = data['resume'].apply(lambda x: exchange[x])
+# data['resume'] = data['resume'].apply(lambda x: exchange[x])
 
 unique_classes = list(data['resume'].unique())
 
@@ -152,5 +153,5 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
                 (subset, '{}/{}'.format(path, name), unique_classes.index(label)) \
                 for subset, name in splits)
 
-folder_destinity = './data/records/contrib_bert_2'
+folder_destinity = './data/records/contrib_bert_3'
 create_record(path=folder_destinity)
