@@ -1,6 +1,7 @@
 tensorflow
-pandas 
+pandas
 joblib
 transformers
 tensorflow_addons
 nltk
+gensim 

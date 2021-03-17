@@ -1,7 +1,7 @@
-import tensorflow as tf 
+import tensorflow as tf
 import argparse
 import json
-import os 
+import os
 
 from core.data import load_records
 from core.model import RNNModel
@@ -18,27 +18,27 @@ from transformers import XLMTokenizer
 tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
 
 def train(opt):
-    train_batches, n_cls = load_records(os.path.join(opt.data, 'train'), 
-                                        batch_size=opt.batch_size, 
+    train_batches, n_cls = load_records(os.path.join(opt.data, 'train'),
+                                        batch_size=opt.batch_size,
                                         return_cls=True)
-    val_batches  = load_records(os.path.join(opt.data, 'val'), 
+    val_batches  = load_records(os.path.join(opt.data, 'val'),
                                 batch_size=opt.batch_size)
-    test_batches = load_records(os.path.join(opt.data, 'test'), 
+    test_batches = load_records(os.path.join(opt.data, 'test'),
                                 batch_size=opt.batch_size)
 
     if opt.model == 'ae':
-        model = RAE(num_units=opt.units, 
-                    num_layers=opt.layers, 
-                    voc_size=opt.vocab_size, 
+        model = RAE(num_units=opt.units,
+                    num_layers=opt.layers,
+                    voc_size=opt.vocab_size,
                     zdim=opt.zdim,
                     dropout=opt.dropout)
         loss = MaskedCrossEntropy()
         metrics = [MaskedACC()]
 
     if opt.model == 'rnn':
-        model = RNNModel(num_units=opt.units, 
-                         num_layers=opt.layers, 
-                         num_cls=n_cls, 
+        model = RNNModel(num_units=opt.units,
+                         num_layers=opt.layers,
+                         num_cls=n_cls,
                          dropout=opt.dropout)
         loss = CategoricalCrossentropy()
         metrics = [Recall(), CustomAccuracy()]
@@ -46,23 +46,23 @@ def train(opt):
 
     model.model(opt.batch_size).summary()
 
-    model.compile(optimizer=Adam(lr=opt.lr), 
-                  loss=loss, 
+    model.compile(optimizer=Adam(lr=opt.lr),
+                  loss=loss,
                   metrics=metrics)
 
-    model.fit(train_batches,
+    model.fit(train_batches.take(1),
               epochs=opt.epochs,
               callbacks=get_callbacks(opt.p),
-              validation_data=val_batches)
+              validation_data=val_batches.take(1))
     # Testing
-    metrics = model.evaluate(test_batches)
+    metrics = model.evaluate(test_batches.take(1))
 
     # Saving metrics and setup file
     os.makedirs(os.path.join(opt.p, 'test'), exist_ok=True)
     test_file = os.path.join(opt.p, 'test/test_metrics.json')
     with open(test_file, 'w') as json_file:
-        json.dump({'loss': metrics[0], 
-                   'recall': metrics[1], 
+        json.dump({'loss': metrics[0],
+                   'recall': metrics[1],
                    'accuracy':metrics[2]}, json_file, indent=4)
 
     conf_file = os.path.join(opt.p, 'conf.json')
@@ -73,7 +73,7 @@ def train(opt):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # TRAINING PAREMETERS
-    parser.add_argument('--data', default='./data/records/contrib_bert_3/', type=str,
+    parser.add_argument('--data', default='./data/records/contrib_ft/', type=str,
                         help='Dataset folder containing the records files')
     parser.add_argument('--p', default="./experiments/test", type=str,
                         help='Proyect path. Here will be stored weights and metrics')
@@ -94,7 +94,7 @@ if __name__ == '__main__':
                         help='Dropout applied to the output of the RNN')
     parser.add_argument('--lr', default=1e-3, type=int,
                         help='Optimizer learning rate')
-    parser.add_argument('--model', default='ae', type=str,
+    parser.add_argument('--model', default='rnn', type=str,
                         help='autoencoder (ae) or recurrent neural network (rnn)')
 
     opt = parser.parse_args()

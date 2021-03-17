@@ -1,9 +1,9 @@
-import tensorflow as tf 
+import tensorflow as tf
 
-from tensorflow.keras.layers import (Input, 
-                                     Layer, 
-                                     LSTMCell, 
-                                     StackedRNNCells, 
+from tensorflow.keras.layers import (Input,
+                                     Layer,
+                                     LSTMCell,
+                                     StackedRNNCells,
                                      RNN,
                                      Dense)
 from tensorflow_addons.rnn import LayerNormLSTMCell
@@ -22,7 +22,7 @@ class RNNModel(Model):
         self.dense = Dense(num_cls, activation='softmax')
 
     def model(self, batch_size):
-        serie_1  = Input(shape=(100, 1), batch_size=batch_size, name='Serie1')
+        serie_1  = Input(shape=(100, 300), batch_size=batch_size, name='Serie1')
         serie_2  = Input(shape=(100, 1), batch_size=batch_size, name='Mask')
         data = (serie_1, serie_2)
         return Model(inputs=data, outputs=self.call(data))
@@ -31,7 +31,7 @@ class RNNModel(Model):
         x, mask = inputs
         x = self.lstm_layer(x, mask=mask, training=training)
         x = self.dense(x)
-        return x 
+        return x
 
     def train_step(self, data):
         x, l, y_true, _, _ = data
@@ -39,8 +39,8 @@ class RNNModel(Model):
         with tf.GradientTape() as tape:
             y_pred = self((x, mask), training=True)
             t_loss = self.compiled_loss(y_true, y_pred)
-            
-        gradients = tape.gradient(t_loss, self.trainable_variables)    
+
+        gradients = tape.gradient(t_loss, self.trainable_variables)
         self.optimizer.apply_gradients(zip(gradients, self.trainable_variables))
         self.compiled_metrics.update_state(y_true, y_pred)
         return {m.name: m.result() for m in self.metrics}
@@ -51,10 +51,10 @@ class RNNModel(Model):
         with tf.GradientTape() as tape:
             y_pred = self((x, mask), training=False)
             t_loss = self.compiled_loss(y_true, y_pred)
-            
+
         self.compiled_metrics.update_state(y_true, y_pred)
         return {m.name: m.result() for m in self.metrics}
-    
+
     def predict_step(self, data):
         x, l, y_true, _, _ = data
         mask = create_mask(x, l)
