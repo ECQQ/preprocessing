@@ -60,4 +60,4 @@ class RNNModel(Model):
         mask = create_mask(x, l)
         y_pred = self((x, mask), training=False)
         self.compiled_metrics.update_state(y_true, y_pred)
-        return {m.name: m.result() for m in self.metrics}
+        return tf.argmax(y_pred, 1),  tf.argmax(y_true, 1)

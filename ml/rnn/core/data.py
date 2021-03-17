@@ -60,7 +60,6 @@ def _parse(sample, n_cls):
     return inputs, tf.cast(ex1['length'], tf.int32), tf.one_hot(ex1['label'], n_cls), ex1['text'], ex1['category']
 
 def load_records(source, batch_size, return_cls=False):
-
     datasets = [tf.data.TFRecordDataset(os.path.join(source, x)) for x in os.listdir(source)]
     n_cls = len(datasets)
 
@@ -69,7 +68,7 @@ def load_records(source, batch_size, return_cls=False):
             lambda x: _parse_ft(x, n_cls), num_parallel_calls=8) for dataset in datasets
     ]
 
-    # datasets = [dataset.repeat() for dataset in datasets]
+    datasets = [dataset.repeat() for dataset in datasets]
     datasets = [dataset.shuffle(5000, reshuffle_each_iteration=True) for dataset in datasets]
     datasets = [dataset.cache() for dataset in datasets]
     dataset  = tf.data.experimental.sample_from_datasets(datasets)

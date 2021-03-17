@@ -50,12 +50,12 @@ def train(opt):
                   loss=loss,
                   metrics=metrics)
 
-    model.fit(train_batches,
+    model.fit(train_batches.take(opt.n_batches),
               epochs=opt.epochs,
               callbacks=get_callbacks(opt.p),
-              validation_data=val_batches)
+              validation_data=val_batches.take(opt.n_batches))
     # Testing
-    metrics = model.evaluate(test_batches)
+    metrics = model.evaluate(test_batches.take(opt.n_batches))
 
     # Saving metrics and setup file
     os.makedirs(os.path.join(opt.p, 'test'), exist_ok=True)
@@ -83,6 +83,8 @@ if __name__ == '__main__':
                         help='vocabulary size')
     parser.add_argument('--epochs', default=2000, type=int,
                         help='Number of epochs')
+    parser.add_argument('--n-batches', default=100, type=int,
+                        help='Number of batches')
     # MODEL HIPERPARAMETERS
     parser.add_argument('--layers', default=2, type=int,
                         help='Number of encoder layers')
@@ -90,7 +92,7 @@ if __name__ == '__main__':
                         help='Number of units within the recurrent unit(s)')
     parser.add_argument('--zdim', default=15, type=int,
                         help='Latent space dimensionality')
-    parser.add_argument('--dropout', default=0.25, type=int,
+    parser.add_argument('--dropout', default=0.25, type=float,
                         help='Dropout applied to the output of the RNN')
     parser.add_argument('--lr', default=1e-3, type=int,
                         help='Optimizer learning rate')
