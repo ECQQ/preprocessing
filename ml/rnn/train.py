@@ -50,12 +50,12 @@ def train(opt):
                   loss=loss,
                   metrics=metrics)
 
-    model.fit(train_batches.take(1),
+    model.fit(train_batches,
               epochs=opt.epochs,
               callbacks=get_callbacks(opt.p),
-              validation_data=val_batches.take(1))
+              validation_data=val_batches)
     # Testing
-    metrics = model.evaluate(test_batches.take(1))
+    metrics = model.evaluate(test_batches)
 
     # Saving metrics and setup file
     os.makedirs(os.path.join(opt.p, 'test'), exist_ok=True)
