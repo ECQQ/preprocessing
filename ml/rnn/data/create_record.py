@@ -57,7 +57,7 @@ data = pd.read_csv(frame_file)
 data['tokens'] = data['tokens'].apply(clean_alt_list)
 data = data[data['resume']!='NR']
 
-# data['resume'] = data['resume'].apply(lambda x: exchange[x])
+data['resume'] = data['resume'].apply(lambda x: exchange[x])
 
 unique_classes = list(data['resume'].unique())
 
