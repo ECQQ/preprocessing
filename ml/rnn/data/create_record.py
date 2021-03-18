@@ -8,17 +8,17 @@ import os, re
 from gensim.models.wrappers import FastText
 from gensim import corpora, models
 from joblib import Parallel, delayed
-from transformers import XLMTokenizer
+# from transformers import XLMTokenizer
 from tqdm import tqdm
 
 from nltk import word_tokenize
 from nltk.stem import SnowballStemmer
 stemmer = SnowballStemmer('spanish')
 
-tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
+# tokenizer = XLMTokenizer.from_pretrained("xlm-mlm-100-1280")
 wordvector = FastText.load_fasttext_format('./data/fasttext-sbwc.bin')
 
-frame_file = './data/cont_no_nr.csv'
+frame_file = './data/contributions.csv'
 
 def clean_alt_list(list_):
     list_ = list_.replace('[', '')
@@ -85,7 +85,7 @@ def train_val_test_split(x, test_ptge=0.25, val_ptge=0.25):
     test = x[: int(size*test_ptge)]
     vali = x[int(size*test_ptge):int(size*test_ptge) + int(size*val_ptge)]
     train = x[int(size*test_ptge) + int(size*val_ptge):]
-
+    print(len(train))
     return (train, 'train'), (vali, 'val'), (test, 'test')
 
 def write_record(subset, folder, filename):
@@ -106,7 +106,6 @@ def process_sentence_fasttext(row, label, dicmap=None):
     except Exception as e:
         input_ids = []
         for t in sentence_words:
-
             if re.search(r'\d+', t):
                 if re.split('\d+',t)[-1] != '':
                     input_ids.append(wordvector[re.split('\d+',t)[-1]])
@@ -115,7 +114,7 @@ def process_sentence_fasttext(row, label, dicmap=None):
             elif re.search(r'[\w]+', t):
                 input_ids.append(wordvector[t])
 
-    if len(input_ids) > 3:
+    if len(input_ids) > 0:
         f = dict()
         f['text'] = _bytes_feature(text.encode('utf-8'))
         for k, dim_tok in enumerate(np.array(input_ids)):
@@ -124,49 +123,6 @@ def process_sentence_fasttext(row, label, dicmap=None):
         f['length'] = _int64_feature(len(input_ids))
         f['category'] = _bytes_feature(label.encode('utf-8'))
         ex = tf.train.Example(features=tf.train.Features(feature=f))
-    return ex
-
-def process_sentence_bert(row, label, dicmap):
-    ex = None
-    text = row['text']
-    if len(text) > 2:
-        input_ids = tokenizer.encode(text)
-        f = dict()
-        f['text'] = _bytes_feature(text.encode('utf-8'))
-        f['input'] = _float_feature(input_ids)
-        f['label'] = _int64_feature(dicmap.index(label))
-        f['length'] = _int64_feature(len(input_ids))
-        f['category'] = _bytes_feature(label.encode('utf-8'))
-        ex = tf.train.Example(features=tf.train.Features(feature=f))
-    return ex
-
-def process_sentence_lemma_bert(row, label, dicmap):
-    ex = None
-    text = row['tokens']
-    text = [stemmer.stem(word) for word in text]
-    text = ''.join(text)
-    input_ids = tokenizer.encode(text)
-    f = dict()
-    f['text'] = _bytes_feature(text.encode('utf-8'))
-    f['input'] = _float_feature(input_ids)
-    f['label'] = _int64_feature(dicmap.index(label))
-    f['length'] = _int64_feature(len(input_ids))
-    f['category'] = _bytes_feature(label.encode('utf-8'))
-    ex = tf.train.Example(features=tf.train.Features(feature=f))
-    return ex
-
-
-def process_sentence_current_domain(row, label, dicmap):
-    ex = None
-    text = row['text']
-    input_ids = [unique_words.index(stemmer.stem(word)) for word in row['tokens']]
-    f = dict()
-    f['text'] = _bytes_feature(text.encode('utf-8'))
-    f['input'] = _float_feature(input_ids)
-    f['label'] = _int64_feature(dicmap.index(label))
-    f['length'] = _int64_feature(len(input_ids))
-    f['category'] = _bytes_feature(label.encode('utf-8'))
-    ex = tf.train.Example(features=tf.train.Features(feature=f))
     return ex
 
 def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None):
@@ -189,5 +145,5 @@ def create_record(path='./records/', val_ptge=0.25, test_ptge=0.25, n_jobs=None)
                 (subset, '{}/{}'.format(path, name), unique_classes.index(label)) \
                 for subset, name in splits)
 
-folder_destinity = './data/records/contrib_ft'
-create_record(path=folder_destinity)
+folder_destinity = './data/records/all_contrib'
+create_record(path=folder_destinity, val_ptge=0.25, test_ptge=0.25)
