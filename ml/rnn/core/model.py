@@ -56,8 +56,8 @@ class RNNModel(Model):
         return {m.name: m.result() for m in self.metrics}
 
     def predict_step(self, data):
-        x, l, y_true, _, _ = data
+        x, l, y_true, text, _ = data
         mask = create_mask(x, l)
         y_pred = self((x, mask), training=False)
         self.compiled_metrics.update_state(y_true, y_pred)
-        return tf.argmax(y_pred, 1),  tf.argmax(y_true, 1)
+        return tf.argmax(y_pred, 1),  tf.argmax(y_true, 1), text

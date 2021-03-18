@@ -26,6 +26,10 @@ def train(opt):
     test_batches = load_records(os.path.join(opt.data, 'test'),
                                 batch_size=opt.batch_size)
 
+    train_batches = train_batches.take(opt.n_batches).cache()
+    val_batches = val_batches.take(opt.n_batches).cache()
+    test_batches = test_batches.take(opt.n_batches).cache()
+
     if opt.model == 'ae':
         model = RAE(num_units=opt.units,
                     num_layers=opt.layers,
@@ -50,12 +54,12 @@ def train(opt):
                   loss=loss,
                   metrics=metrics)
 
-    model.fit(train_batches.take(opt.n_batches),
+    model.fit(train_batches,
               epochs=opt.epochs,
               callbacks=get_callbacks(opt.p),
-              validation_data=val_batches.take(opt.n_batches))
+              validation_data=val_batches)
     # Testing
-    metrics = model.evaluate(test_batches.take(opt.n_batches))
+    metrics = model.evaluate(test_batches)
 
     # Saving metrics and setup file
     os.makedirs(os.path.join(opt.p, 'test'), exist_ok=True)

@@ -59,20 +59,29 @@ def _parse(sample, n_cls):
     inputs = tf.expand_dims(ex1['input'], 1)
     return inputs, tf.cast(ex1['length'], tf.int32), tf.one_hot(ex1['label'], n_cls), ex1['text'], ex1['category']
 
-def load_records(source, batch_size, return_cls=False):
-    datasets = [tf.data.TFRecordDataset(os.path.join(source, x)) for x in os.listdir(source)]
-    n_cls = len(datasets)
+def load_records(source, batch_size, return_cls=False, get_all=False, n_cls=13):
 
-    datasets = [
-        dataset.map(
-            lambda x: _parse_ft(x, n_cls), num_parallel_calls=8) for dataset in datasets
-    ]
+    if get_all:
+        datasets = [os.path.join(source, x) for x in os.listdir(source)]
+        dataset  = tf.data.TFRecordDataset(datasets)
+        dataset  = dataset.map(lambda x: _parse_ft(x, n_cls), num_parallel_calls=8)
+        dataset  = dataset.padded_batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        if return_cls:
+            return dataset, n_cls
+        return dataset
+    else:
+        datasets = [tf.data.TFRecordDataset(os.path.join(source, x)) for x in os.listdir(source)]
+        n_cls = len(datasets)
 
-    datasets = [dataset.repeat() for dataset in datasets]
-    datasets = [dataset.shuffle(5000, reshuffle_each_iteration=True) for dataset in datasets]
-    datasets = [dataset.cache() for dataset in datasets]
-    dataset  = tf.data.experimental.sample_from_datasets(datasets)
-    dataset  = dataset.padded_batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-    if return_cls:
-        return dataset, n_cls
-    return dataset
+        datasets = [
+            dataset.map(
+                lambda x: _parse_ft(x, n_cls), num_parallel_calls=8) for dataset in datasets
+        ]
+
+        datasets = [dataset.repeat() for dataset in datasets]
+        datasets = [dataset.shuffle(5000, reshuffle_each_iteration=True) for dataset in datasets]
+        dataset  = tf.data.experimental.sample_from_datasets(datasets)
+        dataset  = dataset.padded_batch(batch_size).prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        if return_cls:
+            return dataset, n_cls
+        return dataset
