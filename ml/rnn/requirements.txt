@@ -1,7 +1,0 @@
-tensorflow
-pandas
-joblib
-transformers
-tensorflow_addons
-nltk
-gensim 
