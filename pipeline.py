@@ -70,7 +70,7 @@ if __name__ == '__main__':
     t0 = time.time()
     if opt.debug:
         # debug option - smaller dataframe
-        chunksize = 10
+        chunksize = 200
         frame1 = pd.read_csv(opt.data, chunksize=chunksize, low_memory=False)
         for frame_1 in frame1: break
         if opt.data2 != '':
