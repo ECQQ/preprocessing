@@ -1,4 +1,4 @@
-# Cleaner Tool: The preprocessing step
+# The Cleaner Tool: The preprocessing step
 
 This repository include functions used to format tables according to our DB schema. 
 
