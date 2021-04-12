@@ -1,8 +1,8 @@
-# Cleaner Tool: The preprocessing step
+# The Cleaner Tool: The preprocessing step
 
 This repository include functions used to format tables according to our DB schema. 
 
-
+![](https://github.com/ECQQ/preprocessing/blob/main/diagrams/MER.png)
 
 ### Requirements
 - [Docker](https://docs.docker.com/engine/install/)
