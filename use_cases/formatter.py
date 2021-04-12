@@ -79,7 +79,7 @@ new_columnas = [
 
 sex_options = ['F', 'H', 'OTRO']
 
-sex_malo = ['Básica_Incompleta', 'Básica_Completa', 'Media_Incompleta', 'Universitaria_Completa', 'Técnico_Incompleto', 'Técnico_Completo']
+sex_wrong = ['Básica_Incompleta', 'Básica_Completa', 'Media_Incompleta', 'Universitaria_Completa', 'Técnico_Incompleto', 'Técnico_Completo']
 
 education_name = {
     'basica_incompleta' : 'Básica Incompleta',
@@ -97,7 +97,7 @@ education_name = {
     'nr' : 'NR',
 }
 
-education_malo = ['h', 'f']
+education_wrong = ['h', 'f']
 
 education_options = [
     'basica_incompleta',

@@ -70,11 +70,14 @@ def process_individuals():
     p4_orden_cuestionario = pd.read_csv(os.path.join(root, files[2]))
     online = pd.read_csv(os.path.join(root, files[3]))
 
-    # p1_homologada = p1_homologada.sample(20)
-    # consultas = consultas.sample(20)
-    # p4_orden_cuestionario = p4_orden_cuestionario.sample(20)
+    p1_homologada         = p1_homologada.sample(20)
+    consultas             = consultas.sample(20)
+    p4_orden_cuestionario = p4_orden_cuestionario.sample(20)
+    online                = online.sample(20)
 
+    # ============================================
     # Getting information from individuals rows 
+    # ============================================
     info_cols = ['id', 'fecha encuesta', 'edad', 'región', 'comuna', 'educ_entrevistado']
     info_indi = consultas[info_cols]
     info_indi.columns = ['indiv_id', 'date', 'age', 'region', 'comuna', 'level']
@@ -92,7 +95,9 @@ def process_individuals():
 
     info_concat = pd.concat([info_indi, online_info]).reset_index().iloc[:, 1:]
 
-    # emociones
+    # ============================================
+    # Emotions
+    # ============================================
     columns_p1 = [c for c in p1_homologada.columns if re.search('p\d',c)]   
 
     def fn(x):
@@ -153,7 +158,9 @@ def process_individuals():
     emotions_df = emotions_df.sort_values('ind_id').reset_index().iloc[:, 1:]
     emotions_df = emotions_df.replace({'nr': 'NR', '[nr]':'[NR]'})
     
-    # necesidades del pais
+    # ============================================
+    # Country needs
+    # ============================================
     def run_need(col):
         single_p2 = consultas[['id', 'p2_{}_a'.format(col), 'p2_{}_b'.format(col), 'p2_urg'.format(col)]]
 
