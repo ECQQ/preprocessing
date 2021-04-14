@@ -14,14 +14,15 @@ def process_emotions(frame):
     file_ids = []
     for column in question_cols:
         if column.endswith('A'):
-            col = tt.tokenize(frame[column])
-            emo_token.append(col)
-            emo_list.append(frame[column])
-        elif column.endswith('B'):
-            col = tt.tokenize(frame[column])
-            exp_token.append(col)
-            explanations.append(frame[column])
+            name = tt.to_unicode(frame[column])
+            emo_token.append(tt.tokenize(name))
+            emo_list.append(name)
             file_ids.append(frame['ID Archivo'])
+
+        elif column.endswith('B'):
+            exp = tt.to_unicode(frame[column])
+            explanations.append(exp)
+            exp_token.append(tt.tokenize(exp))
 
     file_ids = pd.concat(file_ids)
     emo_token = pd.concat(emo_token)
@@ -30,23 +31,13 @@ def process_emotions(frame):
     exp_token = pd.concat(exp_token)
 
     df_emo = pd.DataFrame()
+    df_emo['file_ids'] = file_ids
     df_emo['name'] = emo_list
-    df_emo['token'] = emo_token
+    df_emo['name_token'] = emo_token
     df_emo['macro'] = emo_list
+    df_emo['text'] = explanations
+    df_emo['text_tokens'] = exp_token
     cond  = ~df_emo['name'].isna()
     df_emo = df_emo[cond]
-
-    df_exp = pd.DataFrame()
-    df_exp['file_ids'] = file_ids
-    df_exp['text'] = explanations
-    df_exp['text_tokens'] = exp_token
-    df_exp = df_exp[cond]
-
-    # UNique emotions and ids
-    unique_emotions = list(df_emo['name'].unique())
-
-    df_emo['emo_id'] = df_emo['name'].apply(lambda x: unique_emotions.index(x))
-    df_exp['emo_id'] = df_emo['emo_id']
-
-    df_emo.drop_duplicates(subset="emo_id", keep="first", inplace=True)
-    return df_emo, df_exp
+    df_emo = df_emo.replace({'nr':''})
+    return df_emo
