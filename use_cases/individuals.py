@@ -2,7 +2,7 @@ import pandas as pd
 import multiprocessing
 import os, re
 import numpy as np
-import textools as tt
+import use_cases.utils.textools as tt
 
 from joblib import Parallel, delayed
 
@@ -53,7 +53,7 @@ priority_dic = {'nr':'NR',
 def process_individuals():
     # Init Pipeline
     num_cores = multiprocessing.cpu_count()
-    
+
     # Comuna code
     comuna_code = pd.read_csv('./datos/codigo_comunas.csv')
     comuna_code = dict(zip(np.array(comuna_code['Código'].values, dtype=str), comuna_code['Comuna'].values))
@@ -76,7 +76,7 @@ def process_individuals():
     online                = online.sample(20)
 
     # ============================================
-    # Getting information from individuals rows 
+    # Getting information from individuals rows
     # ============================================
     info_cols = ['id', 'fecha encuesta', 'edad', 'región', 'comuna', 'educ_entrevistado']
     info_indi = consultas[info_cols]
@@ -98,7 +98,7 @@ def process_individuals():
     # ============================================
     # Emotions
     # ============================================
-    columns_p1 = [c for c in p1_homologada.columns if re.search('p\d',c)]   
+    columns_p1 = [c for c in p1_homologada.columns if re.search('p\d',c)]
 
     def fn(x):
         emotion = x.iloc[1]
@@ -112,7 +112,7 @@ def process_individuals():
                     x.iloc[1] = is_emotion
                 else:
                     x.iloc[1] = ['NR']
-        return x 
+        return x
 
     def run(col):
         single_p1 = p1_homologada[(p1_homologada['p1_{}_a'.format(col)]!='nr')][['id', 'p1_{}_a'.format(col), 'p1_{}_b'.format(col)]]
@@ -131,20 +131,20 @@ def process_individuals():
         final.columns = ['ind_id', 'name', 'arg', 'token_arg']
         final['name'] = tt.equivalent_words(final['name'])
         # ONLINE
-        single_p1_online = online[['id', 
+        single_p1_online = online[['id',
                                    '{} >> Emociones / Sentimientos / Sensaciones'.format(col),
                                    '{} >> Explique lo mencionado'.format(col)]]
         single_p1_online = single_p1_online.dropna()
         single_p1_online.columns = ['ind_id', 'name', 'arg']
-        
+
         single_p1_online['name'] = tt.tokenize(single_p1_online['name'])
         single_p1_online = single_p1_online.apply(lambda x: fn(x), 1)
         single_p1_online['token_arg'] = tt.tokenize(single_p1_online['arg'])
         single_p1_online['name'] = tt.check_spelling(single_p1_online['name'])
 
         ids_all = [[x[0], xx, x[2], x[3]] for x in single_p1_online.values for xx in x[1]]
-        
-        
+
+
         final2 = pd.DataFrame(ids_all)
         final2.columns = ['ind_id', 'name', 'arg', 'token_arg']
         final2['name'] = tt.equivalent_words(final2['name'])
@@ -153,11 +153,11 @@ def process_individuals():
         return final
 
     all_cols = Parallel(n_jobs=num_cores)(delayed(run)(col) \
-                        for col in range(1,4)) 
+                        for col in range(1,4))
     emotions_df = pd.concat(all_cols)
     emotions_df = emotions_df.sort_values('ind_id').reset_index().iloc[:, 1:]
     emotions_df = emotions_df.replace({'nr': 'NR', '[nr]':'[NR]'})
-    
+
     # ============================================
     # Country needs
     # ============================================
@@ -165,9 +165,9 @@ def process_individuals():
         single_p2 = consultas[['id', 'p2_{}_a'.format(col), 'p2_{}_b'.format(col), 'p2_urg'.format(col)]]
 
         # Online inclusion
-        single_p2_o = online[['id', 
-                              '{} >> Necesidad que enfrenta el país'.format(col), 
-                              '{} >> Explique lo mencionado.1'.format(col), 
+        single_p2_o = online[['id',
+                              '{} >> Necesidad que enfrenta el país'.format(col),
+                              '{} >> Explique lo mencionado.1'.format(col),
                               '{} >> Urgencia (solo una)'.format(col)]]
         single_p2_o.columns = ['id', 'p2_{}_a'.format(col), 'p2_{}_b'.format(col), 'p2_urg']
 
@@ -183,7 +183,7 @@ def process_individuals():
         return single_p2
 
     all_cols = Parallel(n_jobs=num_cores)(delayed(run_need)(col) \
-                        for col in range(1,4)) 
+                        for col in range(1,4))
     country_need_df = pd.concat(all_cols)
     country_need_df = country_need_df.sort_values('ind_id').reset_index().iloc[:, 1:]
     country_need_df['priority'] = country_need_df['priority'].replace(priority_dic)
@@ -192,8 +192,8 @@ def process_individuals():
     def run_personal_need(col):
         single_p3 = consultas[['id', 'p3_{}_a'.format(col), 'p3_{}_b'.format(col)]]
         # Online inclusion
-        single_p3_o = online[['id', 
-                              '{} >> Necesidades que enfrento personalmente o que existen en mi hogar o familia'.format(col), 
+        single_p3_o = online[['id',
+                              '{} >> Necesidades que enfrento personalmente o que existen en mi hogar o familia'.format(col),
                               '{} >> Explique lo mencionado.2'.format(col)]]
         single_p3_o.columns = ['id', 'p3_{}_a'.format(col), 'p3_{}_b'.format(col)]
         single_p3 = pd.concat([single_p3, single_p3_o])
@@ -206,7 +206,7 @@ def process_individuals():
         return single_p3
 
     all_cols = Parallel(n_jobs=num_cores)(delayed(run_personal_need)(col) \
-                        for col in range(1,4)) 
+                        for col in range(1,4))
     personal_need_df = pd.concat(all_cols)
     personal_need_df = personal_need_df.sort_values('ind_id').reset_index().iloc[:, 1:]
 
@@ -217,8 +217,8 @@ def process_individuals():
     def run_need_and_rol(col):
         single_p4 = p4_orden_cuestionario[['id_y', 'p4_n{}'.format(col), 'p4_re_{}'.format(col), 'p4_oa_{}'.format(col), 'p4_roa_{}'.format(col)]]
         # Online inclusion
-        single_p4_o = online[['id', 
-                              '{} >> Necesidades del país identificadas'.format(col), 
+        single_p4_o = online[['id',
+                              '{} >> Necesidades del país identificadas'.format(col),
                               '{} >> Rol del Estado (Describa)'.format(col),
                               '{} >> Actor social (empresa, organizaciones sociales, medios de comunicación, comunidad, etc)'.format(col),
                               '{} >> Rol del actor social (Describa)'.format(col)]]
@@ -238,7 +238,7 @@ def process_individuals():
         return single_p4
 
     all_cols = Parallel(n_jobs=num_cores)(delayed(run_need_and_rol)(col) \
-                    for col in range(1,4)) 
+                    for col in range(1,4))
     rol_estado_need_df = pd.concat(all_cols)
     rol_estado_need_df = rol_estado_need_df.sort_values('ind_id').reset_index().iloc[:, 1:]
 

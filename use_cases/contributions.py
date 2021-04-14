@@ -1,5 +1,5 @@
 import multiprocessing
-import textools as tt
+import use_cases.utils.textools as tt
 import pandas as pd
 import numpy as np
 import re, os
@@ -14,7 +14,7 @@ def process_one(row, k):
     text_response = []
     token_response = []
     final = None
-    for column in frame_cols: 
+    for column in frame_cols:
         single_col = pd.Series(row[column])
         single_col = tt.tokenize(single_col)
         single_col = single_col.values[0]
@@ -33,7 +33,7 @@ def process_one(row, k):
     req_serie_text  = text_response[(~pd.isna(text_response)) & (text_response != 'nan')]
     req_serie_token = token_response[(~pd.isna(token_response)) & (token_response != 'nan')]
 
-    id_file   = row['ID Archivo'] 
+    id_file   = row['ID Archivo']
     # AT LEAST ONE ANSWER
     if req_serie_token.shape[0] >= 1:
         serie = pd.Series([id_file]*len(req_serie_token))
@@ -41,7 +41,7 @@ def process_one(row, k):
         final.columns = ['id_file', 'text' , 'tokens']
 
     return final
-    
+
 def process_contributions(frame):
     # Init Pipeline
     num_cores = multiprocessing.cpu_count()
