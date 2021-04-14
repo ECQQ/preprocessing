@@ -19,7 +19,6 @@ from google.auth.transport.requests import Request
 
 nltk.download('stopwords')
 
-
 def to_unicode(column):
     if isinstance(column, list):
         column = pd.Series(column)
