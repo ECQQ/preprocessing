@@ -1,10 +1,10 @@
 datos
+data/.~lock*
+data/*.xlsx
+data/*.csv
 __pycache__/
 credentials.json
 token.pickle
 nuevos_datos
 scrum
 .ipynb_checkpoints/
-data/BBDD_Dialogos_2021_01_27.csv
-data/Consulta_Individual_online_v2.xlsx
-data/Base_final_digitación_Consultas.xlsx
