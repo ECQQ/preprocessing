@@ -1,4 +1,4 @@
-import textools as tt
+import use_cases.utils.textools as tt
 import pandas as pd
 import numpy as np
 import re, os
@@ -35,7 +35,7 @@ def process_emotions(frame):
     df_emo['macro'] = emo_list
     cond  = ~df_emo['name'].isna()
     df_emo = df_emo[cond]
-    
+
     df_exp = pd.DataFrame()
     df_exp['file_ids'] = file_ids
     df_exp['text'] = explanations
@@ -47,6 +47,6 @@ def process_emotions(frame):
 
     df_emo['emo_id'] = df_emo['name'].apply(lambda x: unique_emotions.index(x))
     df_exp['emo_id'] = df_emo['emo_id']
-    
+
     df_emo.drop_duplicates(subset="emo_id", keep="first", inplace=True)
     return df_emo, df_exp
