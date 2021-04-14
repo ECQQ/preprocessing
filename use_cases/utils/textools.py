@@ -31,7 +31,7 @@ def to_unicode(column):
         for c in column.columns:
              column[c] = column[c].apply(lambda x: unidecode(str(x).lower()))
         return column
-
+    return column
 def tokenize(column):
     """ Tokenize a given column
     Args:
