@@ -70,10 +70,8 @@ def get_roles(role_frame, fide, need, exp, prior, who='estado'):
 
     return tuples
 
-def create_table_country_needs(frame):
-    # Init Pipeline
-    num_cores = multiprocessing.cpu_count()
 
+def get_dialogues_info(frame):
     frames = []
     for k in range(1, 6):
         need_0 = frame[['ID Archivo',
@@ -110,6 +108,7 @@ def create_table_country_needs(frame):
 
         frames.append(result)
 
+    #source id + isdiag
 
     needs = pd.concat(frames)
     needs['id'] = range(0, needs.shape[0])
@@ -124,5 +123,34 @@ def create_table_country_needs(frame):
 
     needs = needs.fillna('')
     needs = needs.replace({'NR':'', 'nan':'', '-':''})
+    return needs
+
+def get_individuals_info(indiv_path, online_path):
+    ocols = list(range(12,21))+list(range(27,39))
+    p4_online = pd.read_excel(online_path, 'Sheet1', usecols=ocols)
+
+    p4_handwritten = pd.read_excel(indiv_path, 'P4_ORDEN_CUESTIONARIO')
+
+    for k, c in enumerate(p4_handwritten.columns):
+        print(k, c)
+
+    # for i in range(1, 4):
+    #     online = p4_online[['{} >> Necesidad que enfrenta el país'.format(i),
+    #                         '{} >> Explique lo mencionado.1'.format(i),
+    #                         '{} >> Urgencia (solo una)'.format(i),
+    #                         '{} >> Necesidades del país identificadas'.format(i),
+    #                         '{} >> Rol del Estado (Describa)'.format(i),
+    #                         '{} >> Actor social (empresa, organizaciones sociales, medios de comunicación, comunidad, etc)'.format(i),
+    #                         '{} >> Rol del actor social (Describa)'.format(i)]]
+    #
+    #     break
+
+    return []
+
+def create_table_country_needs(diag_frame, indiv_path, online_path):
+
+    needs = get_dialogues_info(diag_frame)
+
+    needs_i = get_individuals_info(indiv_path, online_path)
 
     return needs

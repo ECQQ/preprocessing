@@ -5,6 +5,13 @@ import re, os
 
 
 
+def get_dialogues_info():
+    pass
+
+def get_individual_info():
+    pass
+
+
 def create_table_emotions(frame):
 
     question_cols = [x for x in frame.columns if re.search(r'P1_\d_[A|B]', x)]
@@ -40,4 +47,5 @@ def create_table_emotions(frame):
     cond  = ~df_emo['name'].isna()
     df_emo = df_emo[cond]
     df_emo = df_emo.replace({'nr':''})
+
     return df_emo
