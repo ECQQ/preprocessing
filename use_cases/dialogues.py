@@ -17,11 +17,12 @@ def create_table_dialogues(frame):
 
     frame = tt.to_unicode(frame)
     frame = frame.replace({0:'', 'nan':'', 'nr':''})
+    frame = frame.rename(columns={'file_id':'diag_id'})
 
-    frame.columns =['file_id', 'date', 'init_time', 'end_time',
+    frame.columns =['diag_id', 'date', 'init_time', 'end_time',
                     'location', 'address', 'comuna_id', 'n_members',
                     'group_name']
 
-    frame = frame.apply(lambda x: get_comunas_id(x, 'comuna_id'), 1)                
+    frame = frame.apply(lambda x: get_comunas_id(x, 'comuna_id'), 1)
 
     return frame

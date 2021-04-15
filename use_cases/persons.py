@@ -36,7 +36,7 @@ def distributed(frame, i):
 
 	single = tt.to_unicode(single)
 	single = single.apply(lambda x: fix_swapped(x, i), 1)
-	single.columns = ['file_id', 'age', 'sex', 'level', 'comuna_id']
+	single.columns = ['diag_id', 'age', 'sex', 'level', 'comuna_id']
 
 	single = single.apply(lambda x: get_comunas_id(x, 'comuna_id'), 1)
 	single = single[~single['age'].isna()]

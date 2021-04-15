@@ -117,8 +117,9 @@ def create_table_country_needs(frame):
     needs['macro'] = ['']*needs.shape[0]
     needs['exp_tokens'] = tt.tokenize(needs['exp'])
     needs['role_tokens'] = tt.tokenize(needs['role'])
+    needs = needs.rename(columns={'file_id':'diag_id'})
 
-    needs = needs[['id', 'name', 'name_tokens', 'macro', 'exp',
+    needs = needs[['id', 'diag_id', 'name', 'name_tokens', 'macro', 'exp',
                     'exp_tokens', 'role', 'role_tokens', 'actor', 'priority']]
 
     needs = needs.fillna('')

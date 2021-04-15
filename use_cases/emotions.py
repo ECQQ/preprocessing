@@ -31,7 +31,7 @@ def create_table_emotions(frame):
     exp_token = pd.concat(exp_token)
 
     df_emo = pd.DataFrame()
-    df_emo['file_ids'] = file_ids
+    df_emo['diag_id'] = file_ids
     df_emo['name'] = emo_list
     df_emo['name_token'] = emo_token
     df_emo['macro'] = emo_list
