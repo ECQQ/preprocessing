@@ -9,6 +9,9 @@ from use_cases.utils.formatter import (regiones_name,
 				                       education_options,
 				                       education_wrong,
 				                       education_name)
+									   
+from use_cases.utils.comunas import get_comunas_id
+
 
 
 def fix_swapped(col, i):
@@ -33,8 +36,9 @@ def distributed(frame, i):
 
 	single = tt.to_unicode(single)
 	single = single.apply(lambda x: fix_swapped(x, i), 1)
-	single.columns = ['file_id', 'age', 'sex', 'level', 'comuna']
+	single.columns = ['file_id', 'age', 'sex', 'level', 'comuna_id']
 
+	single = single.apply(lambda x: get_comunas_id(x, 'comuna_id'), 1)
 	single = single[~single['age'].isna()]
 	single = single[single['sex'] != 'nan']
 	single['age'] = single['age'].apply(lambda x: x[:2])
