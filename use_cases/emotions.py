@@ -37,6 +37,7 @@ def create_table_emotions(frame):
     df_emo['macro'] = emo_list
     df_emo['text'] = explanations
     df_emo['text_tokens'] = exp_token
+    df_emo['id'] = ['{}'.format(k) for k in range(df_emo.shape[0])]
     cond  = ~df_emo['name'].isna()
     df_emo = df_emo[cond]
     df_emo = df_emo.replace({'nr':''})
