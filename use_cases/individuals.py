@@ -65,15 +65,15 @@ def create_table_individuals(online_survey, digi_survey):
     # Getting information from digitalized individuals rows
     # ============================================
 
-    digi.sort_values('correlativo_digitación', inplace=True)
-    digi.drop_duplicates(subset='correlativo_digitación', keep=False, inplace=True)
+    digi.sort_values('id', inplace=True)
+    digi.drop_duplicates(subset='id', keep=False, inplace=True)
 
     digi = digi.apply(lambda x: fix_location(x), 1)
     digi = digi.apply(lambda x: get_age(x, 'edad'), 1)
     digi = digi.apply(lambda x: format_date(x, 'fecha encuesta'), 1)
     digi['educ_entrevistado'] = digi['educ_entrevistado'].replace(educ_dic)
 
-    digi = digi[['correlativo_digitación', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
+    digi = digi[['id', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
     digi['online'] = False
     digi.columns = ['id', 'date', 'age', 'comuna_id', 'level', 'online']
 
