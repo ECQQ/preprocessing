@@ -47,6 +47,7 @@ def create_table_individuals(online_survey, digi_survey):
     online = online_survey.copy()
     digi   = digi_survey.copy()
     online['id'] = ['{}'.format(k) for k in range(online.shape[0])]
+    online_survey['id'] = ['{}'.format(k) for k in range(online.shape[0])]
 
     online = online.apply(lambda x: fix_location_online(x), 1)
     online = online.apply(lambda x: format_date(x, 'Submission Date'), 1)
@@ -66,6 +67,7 @@ def create_table_individuals(online_survey, digi_survey):
     # ============================================
 
     digi['id'] =  ['{}'.format(k) for k in range(online.shape[0],online.shape[0] + digi.shape[0])]
+    digi_survey['id'] =  ['{}'.format(k) for k in range(online.shape[0],online.shape[0] + digi.shape[0])]
 
     digi = digi.apply(lambda x: fix_location(x), 1)
     digi = digi.apply(lambda x: get_age(x, 'edad'), 1)
