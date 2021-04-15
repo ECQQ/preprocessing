@@ -126,24 +126,24 @@ def get_dialogues_info(frame):
     return needs
 
 def get_individuals_info(indiv_path, online_path):
-    ocols = list(range(12,21))+list(range(27,39))
-    p4_online = pd.read_excel(online_path, 'Sheet1', usecols=ocols)
+    ocols = [1]+list(range(12,21))+list(range(27,39))
+    p4_online = pd.read_excel(online_path, 'Sheet1')#, usecols=ocols)
 
-    p4_handwritten = pd.read_excel(indiv_path, 'P4_ORDEN_CUESTIONARIO')
+    ocols = [1]+list(range(8, 21))
+    p4_handwritten = pd.read_excel(indiv_path, 'P4_ORDEN_CUESTIONARIO', usecols=ocols)
 
-    for k, c in enumerate(p4_handwritten.columns):
-        print(k, c)
+    for i in range(1, 4):
+        online = p4_online[['RUN',
+                            '{} >> Necesidad que enfrenta el país'.format(i),
+                            '{} >> Explique lo mencionado.1'.format(i),
+                            '{} >> Urgencia (solo una)'.format(i),
+                            '{} >> Necesidades del país identificadas'.format(i),
+                            '{} >> Rol del Estado (Describa)'.format(i),
+                            '{} >> Actor social (empresa, organizaciones sociales, medios de comunicación, comunidad, etc)'.format(i),
+                            '{} >> Rol del actor social (Describa)'.format(i)]]
 
-    # for i in range(1, 4):
-    #     online = p4_online[['{} >> Necesidad que enfrenta el país'.format(i),
-    #                         '{} >> Explique lo mencionado.1'.format(i),
-    #                         '{} >> Urgencia (solo una)'.format(i),
-    #                         '{} >> Necesidades del país identificadas'.format(i),
-    #                         '{} >> Rol del Estado (Describa)'.format(i),
-    #                         '{} >> Actor social (empresa, organizaciones sociales, medios de comunicación, comunidad, etc)'.format(i),
-    #                         '{} >> Rol del actor social (Describa)'.format(i)]]
-    #
-    #     break
+        print(online)
+        break
 
     return []
 
