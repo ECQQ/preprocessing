@@ -29,27 +29,28 @@ def format_date(x, col):
     return x
 
 def get_age(x, col):
-    if not pd.isna(x[col]):   
+    if not pd.isna(x[col]):
         try:
-            x[col] = re.match(r'\d+', str(x[col])).group(0)   
+            x[col] = re.match(r'\d+', str(x[col])).group(0)
         except AttributeError:
             x[col] = '0'
     else:
         x[col] = '0'
-    return x 
+    return x
 
-def create_table_individuals(online, digi):
+def create_table_individuals(online_survey, digi_survey):
     # Init Pipeline
 
     # ============================================
     # Getting information from online individuals rows
     # ============================================
-    
+    online = online_survey.copy()
+    digi   = digi_survey.copy()
     online['id'] = ['{}'.format(k) for k in range(online.shape[0])]
-    
+
     online = online.apply(lambda x: fix_location_online(x), 1)
     online = online.apply(lambda x: format_date(x, 'Submission Date'), 1)
-    online = online.apply(lambda x: get_age(x, 'Edad'), 1)        
+    online = online.apply(lambda x: get_age(x, 'Edad'), 1)
 
     online = online[['id', 'Submission Date','Edad', 'Comuna', '1. ¿Cuál es el nivel de educación alcanzado por Usted?']]
     online['online'] = True
@@ -65,16 +66,16 @@ def create_table_individuals(online, digi):
     # ============================================
 
     digi['id'] =  ['{}'.format(k) for k in range(online.shape[0],online.shape[0] + digi.shape[0])]
-    
-    digi = digi.apply(lambda x: fix_location(x), 1) 
+
+    digi = digi.apply(lambda x: fix_location(x), 1)
     digi = digi.apply(lambda x: get_age(x, 'edad'), 1)
     digi = digi.apply(lambda x: format_date(x, 'fecha encuesta'), 1)
-    digi['educ_entrevistado'] = digi['educ_entrevistado'].replace(educ_dic)        
+    digi['educ_entrevistado'] = digi['educ_entrevistado'].replace(educ_dic)
 
     digi = digi[['id', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
     digi['online'] = False
     digi.columns = ['id', 'date', 'age', 'comuna_id', 'level', 'online']
-    
+
     digi = digi[~digi['age'].isna()]
     digi['age'] = digi['age'].apply(lambda x: x[:2])
     digi['age'] = digi['age'].astype(int)
@@ -84,4 +85,3 @@ def create_table_individuals(online, digi):
     concat = concat.replace({0:'', 'nan':'', 'nr':''})
 
     return concat
-    

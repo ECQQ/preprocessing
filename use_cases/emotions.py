@@ -5,7 +5,7 @@ import re, os
 
 
 
-def process_emotions(frame):
+def create_table_emotions(frame):
 
     question_cols = [x for x in frame.columns if re.search(r'P1_\d_[A|B]', x)]
 
