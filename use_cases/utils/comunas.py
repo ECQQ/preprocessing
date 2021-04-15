@@ -70,7 +70,7 @@ def get_comunas_id(x, col):
     except KeyError:
         x[col] = comuna_code['nr']
 
-    return x    
+    return x
 
 
 def fix_location_online(x):
@@ -80,17 +80,17 @@ def fix_location_online(x):
         else:
             x['Comuna'] = x['Comuna.1']
     try:
-        x['Comuna'] = comuna_code[unidecode.unidecode(x['Comuna']).lower()]        
+        x['Comuna'] = comuna_code[unidecode.unidecode(x['Comuna']).lower()]
     except KeyError:
         x['Comuna'] = comuna_code[comunas_fix[unidecode.unidecode(x['Comuna']).lower()]]
 
-    return x    
+    return x
 
-def fix_location(x):    
+def fix_location(x):
     if x['comuna'] == 'nr':
         x['comuna'] = 1
 
     if pd.isna(x['comuna']):
         x['comuna'] = 1
 
-    return x        
+    return x

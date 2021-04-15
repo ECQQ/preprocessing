@@ -9,7 +9,7 @@ from use_cases.utils.formatter import (regiones_name,
 				                       education_options,
 				                       education_wrong,
 				                       education_name)
-									   
+
 from use_cases.utils.comunas import get_comunas_id
 
 
@@ -36,7 +36,7 @@ def distributed(frame, i):
 
 	single = tt.to_unicode(single)
 	single = single.apply(lambda x: fix_swapped(x, i), 1)
-	single.columns = ['file_id', 'age', 'sex', 'level', 'comuna_id']
+	single.columns = ['diag_id', 'age', 'sex', 'level', 'comuna_id']
 
 	single = single.apply(lambda x: get_comunas_id(x, 'comuna_id'), 1)
 	single = single[~single['age'].isna()]
@@ -48,7 +48,7 @@ def distributed(frame, i):
 	return single
 
 
-def create_table(frame):
+def create_table_persons(frame):
 	max_member = 30
 	frame['Grupo'] = tt.check_nan(frame['Grupo'])
 
