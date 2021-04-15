@@ -40,20 +40,19 @@ def get_age(x, col):
 
 def create_table_individuals(online_survey, digi_survey):
     # Init Pipeline
-
+    online = online_survey.copy()
+    digi   = digi_survey.copy()
     # ============================================
     # Getting information from online individuals rows
     # ============================================
-    online = online_survey.copy()
-    digi   = digi_survey.copy()
-    online['id'] = ['{}'.format(k) for k in range(online.shape[0])]
-    online_survey['id'] = ['{}'.format(k) for k in range(online.shape[0])]
+    online.sort_values('RUN', inplace=True)
+    online.drop_duplicates(subset='RUN', keep=False, inplace=True)
 
     online = online.apply(lambda x: fix_location_online(x), 1)
     online = online.apply(lambda x: format_date(x, 'Submission Date'), 1)
     online = online.apply(lambda x: get_age(x, 'Edad'), 1)
 
-    online = online[['id', 'Submission Date','Edad', 'Comuna', '1. ¿Cuál es el nivel de educación alcanzado por Usted?']]
+    online = online[['RUN', 'Submission Date','Edad', 'Comuna', '1. ¿Cuál es el nivel de educación alcanzado por Usted?']]
     online['online'] = True
     online.columns = ['id', 'date', 'age', 'comuna_id', 'level', 'online']
 
@@ -66,15 +65,15 @@ def create_table_individuals(online_survey, digi_survey):
     # Getting information from digitalized individuals rows
     # ============================================
 
-    digi['id'] =  ['{}'.format(k) for k in range(online.shape[0],online.shape[0] + digi.shape[0])]
-    digi_survey['id'] =  ['{}'.format(k) for k in range(online.shape[0],online.shape[0] + digi.shape[0])]
+    digi.sort_values('correlativo_digitación', inplace=True)
+    digi.drop_duplicates(subset='correlativo_digitación', keep=False, inplace=True)
 
     digi = digi.apply(lambda x: fix_location(x), 1)
     digi = digi.apply(lambda x: get_age(x, 'edad'), 1)
     digi = digi.apply(lambda x: format_date(x, 'fecha encuesta'), 1)
     digi['educ_entrevistado'] = digi['educ_entrevistado'].replace(educ_dic)
 
-    digi = digi[['id', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
+    digi = digi[['correlativo_digitación', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
     digi['online'] = False
     digi.columns = ['id', 'date', 'age', 'comuna_id', 'level', 'online']
 
