@@ -19,7 +19,7 @@ def create_table_dialogues(frame):
     frame = frame.replace({0:'', 'nan':'', 'nr':''})
     frame = frame.rename(columns={'file_id':'diag_id'})
 
-    frame.columns =['diag_id', 'date', 'init_time', 'end_time',
+    frame.columns =['id', 'date', 'init_time', 'end_time',
                     'location', 'address', 'comuna_id', 'n_members',
                     'group_name']
 

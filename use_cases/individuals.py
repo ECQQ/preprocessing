@@ -64,8 +64,7 @@ def create_table_individuals(online_survey, digi_survey):
     # ============================================
     # Getting information from digitalized individuals rows
     # ============================================
-
-    digi.sort_values('id', inplace=True)
+    # digi.sort_values('id', inplace=True)
     digi.drop_duplicates(subset='id', keep=False, inplace=True)
 
     digi = digi.apply(lambda x: fix_location(x), 1)
