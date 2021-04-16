@@ -56,5 +56,9 @@ def create_table_persons(frame):
 	for i in range(1, max_member+1):
 		 table_cols.append(distributed(frame, i))
 	table = pd.concat(table_cols)
+	table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+	table['id'] = range(0, table.shape[0])
 
+	table = table[['id', 'diag_id', 'age', 'sex', 'level',
+				   'comuna_id', 'age_range']]
 	return table
