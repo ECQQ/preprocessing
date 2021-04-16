@@ -5,8 +5,7 @@ import re, os
 
 
 
-def create_table_emotions(frame):
-
+def get_dialogues_info(frame):
     question_cols = [x for x in frame.columns if re.search(r'P1_\d_[A|B]', x)]
 
     emo_list, explanations = [], []
@@ -33,12 +32,60 @@ def create_table_emotions(frame):
     df_emo = pd.DataFrame()
     df_emo['diag_id'] = file_ids
     df_emo['name'] = emo_list
-    df_emo['name_token'] = emo_token
+    df_emo['name_tokens'] = emo_token
     df_emo['macro'] = emo_list
-    df_emo['text'] = explanations
-    df_emo['text_tokens'] = exp_token
-    df_emo['id'] = ['{}'.format(k) for k in range(df_emo.shape[0])]
+    df_emo['exp'] = explanations
+    df_emo['exp_tokens'] = exp_token
     cond  = ~df_emo['name'].isna()
     df_emo = df_emo[cond]
     df_emo = df_emo.replace({'nr':''})
     return df_emo
+
+def get_individual_info(frame_path, frame_online):
+    frame = pd.read_excel(frame_path, 'P1_HOMOLOGADA')
+
+    frames = []
+    for i in range(1, 3):
+        handwritten = frame[['id', 'p1_{}_a'.format(i), 'p1_{}_b'.format(i)]]
+        handwritten.columns = ['source_id', 'name', 'exp']
+
+        online = frame_online[['RUN',
+                               '{} >> Emociones / Sentimientos / Sensaciones'.format(i),
+                               '{} >> Explique lo mencionado'.format(i)]]
+        online.columns = ['ind_id', 'name', 'exp']
+
+        handwritten['is_online'] = np.zeros(handwritten.shape[0])
+        online['is_online'] = np.ones(online.shape[0])
+
+        p = pd.concat([handwritten, online])
+        p['name'] = tt.to_unicode(p['name'])
+        p['exp'] = tt.to_unicode(p['exp'])
+        frames.append(p)
+
+    table = pd.concat(frames)
+    table = table.fillna('')
+    table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    table['name_tokens'] = tt.tokenize(table['name'])
+    table['exp_tokens'] = tt.tokenize(table['exp'])
+    return table
+
+
+def create_table_emotions(frame, frame_ind_path, frame_ind_online):
+
+    emo_diag = get_dialogues_info(frame)
+    ind_diag = get_individual_info(frame_ind_path, frame_ind_online)
+
+    emo_diag['is_online'] = np.zeros(emo_diag.shape[0])
+
+    table = pd.concat([emo_diag, ind_diag])
+    table['is_online'] = table['is_online'].astype(int)
+
+
+    table = table.fillna('')
+    table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    table = table[table['name'] != '']
+    table['id'] = range(0, table.shape[0])
+    table = table[['id', 'diag_id','ind_id','name',
+                   'name_tokens', 'macro', 'exp', 'exp_tokens',
+                   'is_online', 'source_id']]
+    return table

@@ -6,7 +6,9 @@ import re, os
 
 from joblib import Parallel, delayed
 
-def create_table_contributions(frame):
+
+
+def get_dialogues_info(frame):
     # Init Pipeline
     frame['Grupo'] = tt.check_nan(frame['Grupo'])
 
@@ -15,12 +17,45 @@ def create_table_contributions(frame):
         col = frame[['ID Archivo', 'P5_{}'.format(i)]]
         col.columns = ['diag_id', 'text']
         col['text'] = tt.to_unicode(col['text'])
-        col['text_tokens'] = tt.tokenize(col['text'])
-        col['macro'] = col['text']
         frames.append(col)
 
-    table = pd.concat(frames)
-    table['id'] = range(table.shape[0])
-    table = table[['id', 'diag_id', 'text', 'text_tokens', 'macro']]
+        table = pd.concat(frames)
+        table = table[['diag_id', 'text']]
 
+    return table
+
+def get_individuals_info(frame, frame_online):
+
+    online = frame_online[['RUN',
+    '5. Pregunta: ¿Cuál es mi contribución personal para construir el Chile que queremos?']]
+
+    handwritten = frame[['id', 'p5']]
+    handwritten.columns = ['ind_id', 'text']
+    online.columns = ['ind_id', 'text']
+
+    handwritten = tt.to_unicode(handwritten)
+    online = tt.to_unicode(online)
+
+    handwritten['is_online'] = np.zeros(handwritten.shape[0])
+    online['is_online'] = np.ones(online.shape[0])
+    table = pd.concat([handwritten, online])
+    return table
+
+def create_table_contributions(frame, frame_ind, frame_online_ind):
+    dialog = get_dialogues_info(frame)
+    individual = get_individuals_info(frame_ind, frame_online_ind)
+
+    dialog['is_online'] = np.zeros(dialog.shape[0])
+
+    table = pd.concat([dialog, individual])
+    table['is_online'] = table['is_online'].astype(int)
+
+    table['id'] = range(0, table.shape[0])
+    table['tokens'] = tt.tokenize(table['text'])
+    table['macro'] = table['text']
+    table = table.fillna('')
+    table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    table = table[table['text'] != '']
+    table = table[['id', 'diag_id','ind_id', 'text', 'tokens',
+                   'macro', 'is_online']]
     return table
