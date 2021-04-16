@@ -35,9 +35,9 @@ def check_priority_in_text(row):
 
             if pseudo_prior:
                 pseudo_prior = pseudo_prior.group()
-                pseudo_prior = int(pseudo_prior.strip())
+                pseudo_prior = int(str(pseudo_prior).strip().split('.')[0])
                 # if there is not priority
-                if np.isnan(priority):
+                if priority:
                     priority = pseudo_prior
             priorities.append(priority)
 
