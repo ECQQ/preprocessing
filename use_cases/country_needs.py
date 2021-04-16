@@ -20,7 +20,7 @@ def check_priority_in_text(row):
         if len(cases) > 1:
             cases = [int(c) for c in cases]
             delta = np.diff(cases)
-            priorities = cases+1
+            priorities = np.array(cases)+1
             # consecutive cases should be 1-spaced located
             if np.mean(delta) == 1:
                 splits = re.split(r'\d', need)
@@ -115,9 +115,9 @@ def get_dialogues_info(frame):
     needs['macro'] = ['']*needs.shape[0]
     needs['exp_tokens'] = tt.tokenize(needs['exp'])
     needs['role_tokens'] = tt.tokenize(needs['role'])
-    needs = needs.rename(columns={'file_id':'source_id'})
+    needs = needs.rename(columns={'file_id':'diag_id'})
 
-    needs = needs[['source_id', 'name', 'name_tokens', 'macro', 'exp',
+    needs = needs[['diag_id', 'name', 'name_tokens', 'macro', 'exp',
                     'exp_tokens', 'role', 'role_tokens', 'actor', 'priority']]
 
     needs = needs.fillna('')
@@ -143,7 +143,7 @@ def get_individuals_info(frame, indiv_path, online_path):
                             '{} >> Actor social (empresa, organizaciones sociales, medios de comunicación, comunidad, etc)'.format(i),
                             '{} >> Rol del actor social (Describa)'.format(i)]]
 
-        online.columns = ['source_id', 'exp', 'priority', 'name', 'state_role', 'actor', 'actor_role']
+        online.columns = ['ind_id', 'exp', 'priority', 'name', 'state_role', 'actor', 'actor_role']
 
         online = tt.to_unicode(online)
 
@@ -151,11 +151,11 @@ def get_individuals_info(frame, indiv_path, online_path):
         online['actor'] = online['actor'].apply(lambda x: tt.check_string(x))
         online = online.replace({'nr':'', 'nan':'', 'NR':'', 'NaN':'', np.nan:''})
 
-        online_a = online[online['actor'] == ''][['source_id', 'exp', 'priority', 'name', 'state_role']]
+        online_a = online[online['actor'] == ''][['ind_id', 'exp', 'priority', 'name', 'state_role']]
         online_a['actor'] = ['estado']*online_a.shape[0]
         online_a = online_a.rename(columns={'state_role':'role'})
 
-        online_b = online[online['actor'] != ''][['source_id','exp', 'priority', 'name', 'actor', 'actor_role']]
+        online_b = online[online['actor'] != ''][['ind_id','exp', 'priority', 'name', 'actor', 'actor_role']]
         online_b = online_b.rename(columns={'actor_role':'role'})
 
 
@@ -171,15 +171,15 @@ def get_individuals_info(frame, indiv_path, online_path):
         ids = [frame[frame['correlativo_digitación'] == corr]['id'].values[0]\
                             for corr in handwritten['correlativo_digitación']]
 
-        handwritten['source_id'] = ids
+        handwritten['ind_id'] = ids
         handwritten = handwritten.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
         handwritten = handwritten[handwritten['p4_n{}'.format(i)] != '']
-        handwritten.columns = ['cd', 'name', 'state_role', 'actor', 'actor_role', 'source_id']
+        handwritten.columns = ['cd', 'name', 'state_role', 'actor', 'actor_role', 'ind_id']
 
-        handwritten_a = handwritten[handwritten['actor'] == ''][['source_id', 'name', 'state_role']]
+        handwritten_a = handwritten[handwritten['actor'] == ''][['ind_id', 'name', 'state_role']]
         handwritten_a['actor'] = ['estado']*handwritten_a.shape[0]
         handwritten_a = handwritten_a.rename(columns={'state_role':'role'})
-        handwritten_b = handwritten[handwritten['actor'] != ''][['source_id', 'name', 'actor', 'actor_role']]
+        handwritten_b = handwritten[handwritten['actor'] != ''][['ind_id', 'name', 'actor', 'actor_role']]
         handwritten_b = handwritten_b.rename(columns={'actor_role':'role'})
         handwritten = pd.concat([handwritten_a, handwritten_b])
         handwritten = tt.to_unicode(handwritten)
@@ -189,12 +189,12 @@ def get_individuals_info(frame, indiv_path, online_path):
                                'p2_{}_b'.format(i),
                                'p2_urg']]
 
-        handwritten_2.columns = ['source_id', 'name', 'arg', 'priority']
+        handwritten_2.columns = ['ind_id', 'name', 'arg', 'priority']
         handwritten_2 = handwritten_2.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
         handwritten_2 = tt.to_unicode(handwritten_2)
 
         handwritten = pd.merge(handwritten, handwritten_2,
-                               how="outer", on=["name", "source_id"])
+                               how="outer", on=["name", "ind_id"])
 
         handwritten['is_online'] = np.zeros(handwritten.shape[0])
         online['is_online'] = np.ones(online.shape[0])
@@ -209,7 +209,7 @@ def get_individuals_info(frame, indiv_path, online_path):
     needs['exp_tokens'] = tt.tokenize(needs['exp'])
     needs['role_tokens'] = tt.tokenize(needs['role'])
 
-    needs = needs[['source_id', 'name', 'name_tokens', 'macro', 'exp',
+    needs = needs[['ind_id', 'name', 'name_tokens', 'macro', 'exp',
                     'exp_tokens', 'role', 'role_tokens', 'actor', 'priority', 'is_online']]
 
     needs = needs.fillna('')
@@ -223,17 +223,17 @@ def create_table_country_needs(diag_frame, ind_survey, indiv_path, online_path):
 
     needs_i = get_individuals_info(ind_survey, indiv_path, online_path)
 
-    needs['is_dialogue'] = np.ones(needs.shape[0])
     needs['is_online'] = np.zeros(needs.shape[0])
-    needs_i['is_dialogue'] = np.zeros(needs_i.shape[0])
 
     need_table = pd.concat([needs, needs_i])
     need_table['is_online'] = need_table['is_online'].astype(int)
-    need_table['is_dialogue'] = need_table['is_dialogue'].astype(int)
 
     need_table = need_table.fillna('')
     need_table = need_table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
     need_table = need_table[need_table['name'] != '']
     need_table['id'] = range(0, need_table.shape[0])
 
+    need_table = need_table[['id', 'diag_id', 'ind_id', 'name', 'name_tokens',
+                              'macro', 'exp', 'exp_tokens', 'role',
+                              'role_tokens', 'actor', 'priority', 'is_online' ]]
     return need_table
