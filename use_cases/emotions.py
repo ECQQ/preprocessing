@@ -30,7 +30,7 @@ def get_dialogues_info(frame):
     exp_token = pd.concat(exp_token)
 
     df_emo = pd.DataFrame()
-    df_emo['source_id'] = file_ids
+    df_emo['diag_id'] = file_ids
     df_emo['name'] = emo_list
     df_emo['name_tokens'] = emo_token
     df_emo['macro'] = emo_list
@@ -52,7 +52,7 @@ def get_individual_info(frame_path, frame_online):
         online = frame_online[['RUN',
                                '{} >> Emociones / Sentimientos / Sensaciones'.format(i),
                                '{} >> Explique lo mencionado'.format(i)]]
-        online.columns = ['source_id', 'name', 'exp']
+        online.columns = ['ind_id', 'name', 'exp']
 
         handwritten['is_online'] = np.zeros(handwritten.shape[0])
         online['is_online'] = np.ones(online.shape[0])
@@ -75,18 +75,17 @@ def create_table_emotions(frame, frame_ind_path, frame_ind_online):
     emo_diag = get_dialogues_info(frame)
     ind_diag = get_individual_info(frame_ind_path, frame_ind_online)
 
-    emo_diag['is_dialogue'] = np.ones(emo_diag.shape[0])
     emo_diag['is_online'] = np.zeros(emo_diag.shape[0])
-
-    ind_diag['is_dialogue'] = np.zeros(ind_diag.shape[0])
 
     table = pd.concat([emo_diag, ind_diag])
     table['is_online'] = table['is_online'].astype(int)
-    table['is_dialogue'] = table['is_dialogue'].astype(int)
+
 
     table = table.fillna('')
     table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
     table = table[table['name'] != '']
     table['id'] = range(0, table.shape[0])
-
+    table = table[['id', 'diag_id','ind_id','name',
+                   'name_tokens', 'macro', 'exp', 'exp_tokens',
+                   'is_online', 'source_id']]
     return table
