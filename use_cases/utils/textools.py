@@ -273,3 +273,17 @@ def check_nan(condition, when_nan='NR'):
     except Exception as e:
         response = 'NR'
     return response
+
+def tokens_to_str(tokens):
+    tokens_str = ''
+        
+    if tokens == None or tokens == 'NR':
+        tokens_str = '[]'
+    else:
+        tokens_str = '['
+        for i in range(len(tokens)):
+            if i == len(tokens) - 1:
+                tokens_str += ('"'+tokens[i].replace(' ','')+'"]')
+            else:
+                tokens_str += ('"'+tokens[i].replace(' ','')+'",')
+    return tokens_str    

@@ -89,3 +89,51 @@ def create_table_emotions(frame, frame_ind_path, frame_ind_online):
                    'name_tokens', 'macro', 'exp', 'exp_tokens',
                    'is_online', 'source_id']]
     return table
+
+def to_sql(frame, output_file):
+    values = list()
+
+    for index, row in frame.iterrows():
+        id = row['id']
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        name = row['name']
+        name_tokens = row['name_tokens']       
+        
+        macro = row['macro']
+        if macro != None:
+            if macro == '\'':
+                macro = ''
+            if macro != '':
+                macro = macro.replace('\'','')
+
+        exp = row['exp'] 
+        exp_tokens =  row['exp_tokens'] 
+        
+        is_online = row['is_online']     
+
+        name_tokens_str = tt.tokens_to_str(name_tokens)
+
+        exp_tokens_str = tt.tokens_to_str(exp_tokens)
+
+        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+            id,
+            diag_id, 
+            ind_id,
+            name,
+            name_tokens_str,
+            macro,
+            exp,
+            exp_tokens_str,
+            is_online
+            )
+        values.append(string_value)     
+
+    with open(output_file, 'w') as new_file:
+        for index, value in enumerate(values):
+            if index == 0:
+                print('INSERT INTO emotion VALUES {},'.format(value), file=new_file)
+            elif index == len(values) - 1:
+                print('''{};'''.format(value), file=new_file)
+            else:
+                print('{},'.format(value), file=new_file)    

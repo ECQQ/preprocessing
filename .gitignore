@@ -2,6 +2,8 @@ datos
 data/.~lock*
 data/*.xlsx
 data/*.csv
+db/CSV/*
+db/CSV.zip
 __pycache__/
 credentials.json
 token.pickle

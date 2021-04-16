@@ -237,3 +237,64 @@ def create_table_country_needs(diag_frame, ind_survey, indiv_path, online_path):
                               'macro', 'exp', 'exp_tokens', 'role',
                               'role_tokens', 'actor', 'priority', 'is_online' ]]
     return need_table
+
+def to_sql(frame, output_file):
+    values = list()
+
+    for index, row in frame.iterrows():
+        id = row['id']
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        name = row['name']
+        name_tokens = row['name_tokens']       
+        
+        macro = row['macro']
+        if macro != None:
+            if macro == '\'':
+                macro = ''
+            if macro != '':
+                macro = macro.replace('\'','')
+
+        exp = row['exp'] 
+        exp_tokens =  row['exp_tokens'] 
+
+        role = row['role']
+        role_tokens = row['role_tokens']
+
+        actor = row['actor']
+        priority = row['priority']    
+        
+        is_online = row['is_online']     
+
+        name_tokens_str = tt.tokens_to_str(name_tokens)
+
+        exp_tokens_str = tt.tokens_to_str(exp_tokens)
+
+        role_tokens_str = tt.tokens_to_str(role_tokens)
+
+        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+            id,
+            diag_id, 
+            ind_id,
+            name,
+            name_tokens_str,
+            macro,
+            exp,
+            exp_tokens_str,
+            role,
+            role_tokens_str,
+            actor,
+            priority,
+            is_online
+            )
+        values.append(string_value)     
+
+    with open(output_file, 'w') as new_file:
+        for index, value in enumerate(values):
+            if index == 0:
+                print('INSERT INTO country_need VALUES {},'.format(value), file=new_file)
+            elif index == len(values) - 1:
+                print('''{};'''.format(value), file=new_file)
+            else:
+                print('{},'.format(value), file=new_file)
+

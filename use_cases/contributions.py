@@ -59,3 +59,45 @@ def create_table_contributions(frame, frame_ind, frame_online_ind):
     table = table[['id', 'diag_id','ind_id', 'text', 'tokens',
                    'macro', 'is_online']]
     return table
+
+def to_sql(frame, output_file):
+    values = list()
+
+    for index, row in frame.iterrows():
+        id = row['id']
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        text = row['text'].replace('\'','')
+        is_online = row['is_online']
+        
+        macro = row['macro']
+
+        if macro != None:
+            if macro == '\'':
+                macro = ''
+            if macro != '':
+                macro = macro.replace('\'','')    
+
+        tokens = row['tokens']
+
+        tokens_str = tt.tokens_to_str(tokens)
+
+        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+            id,
+            diag_id, 
+            ind_id,
+            text, 
+            tokens_str, 
+            macro,
+            is_online
+            )
+        values.append(string_value)     
+
+    with open(output_file, 'w') as new_file:
+        for index, value in enumerate(values):
+            if index == 0:
+                print('INSERT INTO contribution VALUES {},'.format(value), file=new_file)
+            elif index == len(values) - 1:
+                print('''{};'''.format(value), file=new_file)
+            else:
+                print('{},'.format(value), file=new_file)
