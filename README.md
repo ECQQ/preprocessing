@@ -1,27 +1,30 @@
 # The Cleaner Tool: The preprocessing step
 
-This repository include functions used to format tables according to our DB schema. 
+En este repositorio podemos encontrar el Pipeline utilizado para limpiar y formatear los datos siguiendo el modelo entidad-relacion (MER) a continuacion:
 
 ![](https://github.com/ECQQ/preprocessing/blob/main/diagrams/MER.png)
 
-### Requirements
+### Requisitos
 - [Docker](https://docs.docker.com/engine/install/)
 - [Docker-compose](https://docs.docker.com/compose/install/)
 
-### Usage
-##### Building images and container 
-1. Run `docker-compose build` from the root folder (where `docker-compose.yml` is alocated)
-2. To star the container use: `docker-compose up -d` (where `-d` means detached)
-3. Similarly, for the container stopping run: `docker-compose stop`
+### Uso
+##### Construir el contenedor
+1. Ejecutar `docker-compose build` desde la carpeta raiz (i.e., donde esta el archivo `docker-compose.yml`)
+2. Para iniciar el contenedor: `docker-compose up -d` (donde `-d` significa "detached")
+3. De manera similar, para detener el contenedor utilizamos: `docker-compose stop`
 
-##### Running scripts 
-To run scripts inside the container, we need to open an interactive session.
-1. We already known our container is named `cleaner`, but if you want to see running containers just use: `docker container ls`
-2. To initialize an interactive session use: `docker exec -it cleaner bash`
-3. Then you can use bash command as usually
+##### Otros comandos de utilidad
+Para ingresar al contenedor y ejecutar scripts o instalar alguna dependencia temporal:
+1. Debemos ver los contenedores que se estan ejecutando con: `docker container ls`
+2. Para entrar en el contenedor: `docker exec -it cleaner bash`. En este caso `cleaner` es el nombre de nuestro contenedor
+3. Luego puedes utilizar `bash` normalmente.
+
+Cualquier paquete o dependencia que sea instalada en modo interactivo se borrara al detener el contenedor. Para hacer persistente alguna dependencia debes modificar el `requirements.txt` (para paquetes de python) o el Dockerfile (para instalar paquetes del sistema)
 
 ##### Jupyter notebook 
-By default the image container starts jupyter notebook service (in background). You may see the jupyter logs by removing `-d` argument in *step 2 on Building images and container Section*. 
+Por default la imagen del contenedor inicia una sesion en jupyter notebook. Como nosotros ejecutamos el contenedor en modo "detached" no podemos ver los logs. Los logs nos indicaran la ruta donde esta corriendo el notebook (la cual tiene asociado un token de seguridad).
 
-1. If our container is running in *detached mode* just use: `docker logs cleaner -f` to display logs. 
-2. Then, copy the notebook link which includes the security token and and paste it on your browser.
+Una opcion es sacar el `-d` en el paso 2, sin embargo tambien podemos usar:
+1. `docker logs -f cleaner` para visualizar los logs del contenedor. 
+2. Luego copia el link que tiene asociado el token de seguridad en tu navegador
