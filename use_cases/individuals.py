@@ -2,6 +2,7 @@ import pandas as pd
 import multiprocessing
 import os, re
 import numpy as np
+import uuid
 
 from use_cases.utils.comunas import comuna_code, comunas_fix, fix_location, fix_location_online
 from use_cases.utils.textools import stratify_frame_by_age
@@ -38,14 +39,22 @@ def get_age(x, col):
         x[col] = '0'
     return x
 
+def empty_ids(x, col):
+    id = x[col]
+    if id == '' or id == 'nr' or id == 'NR':
+        x[col] = str(uuid.uuid4())
+    return x
+
 def create_table_individuals(online_survey, digi_survey):
     # Init Pipeline
+    online_survey['RUN'] = online_survey['RUN'].replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    online = online_survey.apply(lambda x: empty_ids(x, 'RUN'), 1)
     online = online_survey.copy()
+    digi = digi_survey.apply(lambda x: empty_ids(x, 'id'), 1)
     digi   = digi_survey.copy()
     # ============================================
     # Getting information from online individuals rows
     # ============================================
-    online.sort_values('RUN', inplace=True)
     online.drop_duplicates(subset='RUN', keep=False, inplace=True)
 
     online = online.apply(lambda x: fix_location_online(x), 1)
@@ -60,11 +69,11 @@ def create_table_individuals(online_survey, digi_survey):
     online['age'] = online['age'].apply(lambda x: x[:2])
     online['age'] = online['age'].astype(int)
     online = stratify_frame_by_age(online)
+    online = online.replace({0:'', 'nan':'', 'nr':''})
 
     # ============================================
     # Getting information from digitalized individuals rows
     # ============================================
-    # digi.sort_values('id', inplace=True)
     digi.drop_duplicates(subset='id', keep=False, inplace=True)
 
     digi = digi.apply(lambda x: fix_location(x), 1)
@@ -73,15 +82,16 @@ def create_table_individuals(online_survey, digi_survey):
     digi['educ_entrevistado'] = digi['educ_entrevistado'].replace(educ_dic)
 
     digi = digi[['id', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
-    digi['online'] = False
-    digi.columns = ['id', 'date', 'age', 'comuna_id', 'level', 'online']
+    
+    digi.columns = ['id', 'date', 'age', 'comuna_id', 'level']
 
     digi = digi[~digi['age'].isna()]
     digi['age'] = digi['age'].apply(lambda x: x[:2])
     digi['age'] = digi['age'].astype(int)
     digi = stratify_frame_by_age(digi)
+    digi = digi.replace({0:'', 'nan':'', 'nr':''})
+    digi['online'] = False
 
     concat = pd.concat([digi, online]).reset_index().iloc[:, 1:]
-    concat = concat.replace({0:'', 'nan':'', 'nr':''})
 
     return concat

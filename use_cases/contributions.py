@@ -9,6 +9,7 @@ from joblib import Parallel, delayed
 
 
 def get_dialogues_info(frame):
+    frame = frame.replace("'",'"')
     # Init Pipeline
     frame['Grupo'] = tt.check_nan(frame['Grupo'])
 
@@ -25,6 +26,8 @@ def get_dialogues_info(frame):
     return table
 
 def get_individuals_info(frame, frame_online):
+    frame = frame.replace("'",'"')
+    frame_online = frame_online.replace("'",'"')
 
     online = frame_online[['RUN',
     '5. Pregunta: ¿Cuál es mi contribución personal para construir el Chile que queremos?']]
@@ -36,8 +39,8 @@ def get_individuals_info(frame, frame_online):
     handwritten = tt.to_unicode(handwritten)
     online = tt.to_unicode(online)
 
-    handwritten['is_online'] = np.zeros(handwritten.shape[0])
-    online['is_online'] = np.ones(online.shape[0])
+    handwritten['is_online'] = False
+    online['is_online'] = True
     table = pd.concat([handwritten, online])
     return table
 
@@ -45,10 +48,9 @@ def create_table_contributions(frame, frame_ind, frame_online_ind):
     dialog = get_dialogues_info(frame)
     individual = get_individuals_info(frame_ind, frame_online_ind)
 
-    dialog['is_online'] = np.zeros(dialog.shape[0])
+    dialog['is_online'] = False
 
     table = pd.concat([dialog, individual])
-    table['is_online'] = table['is_online'].astype(int)
 
     table['id'] = range(0, table.shape[0])
     table['tokens'] = tt.tokenize(table['text'])

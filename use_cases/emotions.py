@@ -6,6 +6,7 @@ import re, os
 
 
 def get_dialogues_info(frame):
+    frame = frame.replace("'",'"')
     question_cols = [x for x in frame.columns if re.search(r'P1_\d_[A|B]', x)]
 
     emo_list, explanations = [], []
@@ -41,21 +42,24 @@ def get_dialogues_info(frame):
     df_emo = df_emo.replace({'nr':''})
     return df_emo
 
-def get_individual_info(frame_path, frame_online):
+def get_individual_info(frame_path, frame_online):    
     frame = pd.read_excel(frame_path, 'P1_HOMOLOGADA')
+
+    frame = frame.replace("'",'"')
+    frame_online = frame_online.replace("'",'"')
 
     frames = []
     for i in range(1, 3):
         handwritten = frame[['id', 'p1_{}_a'.format(i), 'p1_{}_b'.format(i)]]
-        handwritten.columns = ['source_id', 'name', 'exp']
+        handwritten.columns = ['ind_id', 'name', 'exp']
 
         online = frame_online[['RUN',
                                '{} >> Emociones / Sentimientos / Sensaciones'.format(i),
                                '{} >> Explique lo mencionado'.format(i)]]
         online.columns = ['ind_id', 'name', 'exp']
 
-        handwritten['is_online'] = np.zeros(handwritten.shape[0])
-        online['is_online'] = np.ones(online.shape[0])
+        handwritten['is_online'] = False
+        online['is_online'] = True
 
         p = pd.concat([handwritten, online])
         p['name'] = tt.to_unicode(p['name'])
@@ -71,15 +75,13 @@ def get_individual_info(frame_path, frame_online):
 
 
 def create_table_emotions(frame, frame_ind_path, frame_ind_online):
-
+    
     emo_diag = get_dialogues_info(frame)
     ind_diag = get_individual_info(frame_ind_path, frame_ind_online)
 
-    emo_diag['is_online'] = np.zeros(emo_diag.shape[0])
+    emo_diag['is_online'] = True
 
     table = pd.concat([emo_diag, ind_diag])
-    table['is_online'] = table['is_online'].astype(int)
-
 
     table = table.fillna('')
     table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
@@ -87,7 +89,7 @@ def create_table_emotions(frame, frame_ind_path, frame_ind_online):
     table['id'] = range(0, table.shape[0])
     table = table[['id', 'diag_id','ind_id','name',
                    'name_tokens', 'macro', 'exp', 'exp_tokens',
-                   'is_online', 'source_id']]
+                   'is_online']]
     return table
 
 def to_sql(frame, output_file):

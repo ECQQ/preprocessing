@@ -287,3 +287,20 @@ def tokens_to_str(tokens):
             else:
                 tokens_str += ('"'+tokens[i].replace(' ','')+'",')
     return tokens_str    
+
+def clean_alt_list(list_):
+    list_ = str(list_)
+    list_ = list_.replace('[', '')
+    list_ = list_.replace(']', '')
+    list_ = list_.replace("'", '')
+    list_ = list_.split(',')
+    return list_
+
+def str_to_int(x):
+    try:
+        x = float(x)    
+    except ValueError:
+        if x == 'urgencia (solo una)' or x == '' or x == 'fuerzas armadas en las calles' or x == 'urgente' or x == 'primera' or x == 'segunda':
+            x = 0
+    x = int(x)
+    return x
