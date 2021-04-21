@@ -1,4 +1,5 @@
-# The Cleaner Tool: The preprocessing step
+# Herramienta de Limpieza
+## Etapa de Preprocesamiento
 
 En este repositorio podemos encontrar el Pipeline utilizado para limpiar y formatear los datos siguiendo el modelo entidad-relacion (MER) a continuacion:
 
