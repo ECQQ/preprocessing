@@ -1,16 +1,16 @@
 CREATE TABLE country_needs
 (
 	id integer PRIMARY KEY,
-	diag_id varchar(32) REFERENCES dialogues(id),
-	ind_id varchar(32) REFERENCES individuals(id),
-	name varchar(128),
+	diag_id varchar(64) REFERENCES dialogues(id),
+	ind_id varchar(64) REFERENCES individuals(id),
+	name varchar(4096),
 	name_tokens json,
-	macro varchar(128),
-	exp varchar(512),
+	macro varchar(257),
+	exp varchar(2048),
 	exp_tokens json,
-	role varchar(512),
+	role varchar(1025),
 	role_tokens json,
-	actor varchar(128),
+	actor varchar(4097),
 	priority integer,	
-	is_online integer	
+	is_online boolean	
 );

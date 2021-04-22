@@ -275,17 +275,17 @@ def check_nan(condition, when_nan='NR'):
     return response
 
 def tokens_to_str(tokens):
-    tokens_str = ''
+    tokens_str = ""
         
-    if tokens == None or tokens == 'NR':
+    if tokens == None or tokens == 'NR' or tokens == '':
         tokens_str = '[]'
     else:
         tokens_str = '['
         for i in range(len(tokens)):
             if i == len(tokens) - 1:
-                tokens_str += ('"'+tokens[i].replace(' ','')+'"]')
+                tokens_str += ('"{}"'.format(tokens[i].replace(' ',''))+']')
             else:
-                tokens_str += ('"'+tokens[i].replace(' ','')+'",')
+                tokens_str += ('"{}"'.format(tokens[i].replace(' ',''))+',')
     return tokens_str    
 
 def clean_alt_list(list_):

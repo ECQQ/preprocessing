@@ -66,7 +66,7 @@ def distributed(frame, i):
 	single['level'] = single['level'].apply(lambda x: apply_dict_education(x))
 	return single
 
-def create_table_persons(frame, filter):
+def create_table_persons(frame):
 	max_member = 30
 	frame['Grupo'] = tt.check_nan(frame['Grupo'])
 
@@ -85,10 +85,8 @@ def create_table_persons(frame, filter):
 	
 	table = table.rename(columns={'run': 'id'})
 
-	# filter.columns = ['id', 'es_rut', 'es_reg_civil', 'is_dead', 'is_valid']
 
 	table = table[['id', 'diag_id', 'age', 'sex', 'level',
 				   'comuna_id', 'age_range']]
-
-	# table = pd.merge(table, filter, how="inner", on=["id"])			   
+			   
 	return table

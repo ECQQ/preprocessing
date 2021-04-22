@@ -55,7 +55,7 @@ def create_table_individuals(online_survey, digi_survey):
     # ============================================
     # Getting information from online individuals rows
     # ============================================
-    online.drop_duplicates(subset='RUN', keep=False, inplace=True)
+    online.drop_duplicates(subset='RUN', inplace=True)
 
     online = online.apply(lambda x: fix_location_online(x), 1)
     online = online.apply(lambda x: format_date(x, 'Submission Date'), 1)
@@ -74,7 +74,7 @@ def create_table_individuals(online_survey, digi_survey):
     # ============================================
     # Getting information from digitalized individuals rows
     # ============================================
-    digi.drop_duplicates(subset='id', keep=False, inplace=True)
+    digi.drop_duplicates(subset='id', inplace=True)
 
     digi = digi.apply(lambda x: fix_location(x), 1)
     digi = digi.apply(lambda x: get_age(x, 'edad'), 1)

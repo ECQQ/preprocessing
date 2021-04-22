@@ -1,12 +1,12 @@
 CREATE TABLE emotions
 (
 	id integer PRIMARY KEY,
-	diag_id varchar(32) REFERENCES dialogues(id),
-	ind_id varchar(32) REFERENCES individuals(id),
-	name varchar(32),
+	diag_id varchar(64) REFERENCES dialogues(id),
+	ind_id varchar(64) REFERENCES individuals(id),
+	name varchar(2048),
 	name_tokens json,
-	macro varchar(32),
-	exp varchar(512),
+	macro varchar(2048),
+	exp varchar(2048),
 	exp_tokens json,
-	is_online integer
+	is_online boolean
 );

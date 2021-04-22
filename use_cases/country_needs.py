@@ -244,11 +244,11 @@ def create_table_country_needs(diag_frame, ind_survey, indiv_path, online_path):
     need_table = need_table[need_table['name'] != '']
     need_table['id'] = range(0, need_table.shape[0])
 
-    
-
     need_table = need_table[['id', 'diag_id', 'ind_id', 'name', 'name_tokens',
                               'macro', 'exp', 'exp_tokens', 'role',
                               'role_tokens', 'actor', 'priority', 'is_online' ]]
+
+    need_table = need_table.drop(need_table[(need_table['diag_id'] == '') & (need_table['ind_id'] == '')].index)                              
     return need_table
 
 def to_sql(frame, output_file):
@@ -256,10 +256,8 @@ def to_sql(frame, output_file):
 
     for index, row in frame.iterrows():
         id = row['id']
-        diag_id = row['diag_id']
-        ind_id = row['ind_id']
-        name = row['name']
-        name_tokens = row['name_tokens']       
+        name = row['name'].replace('\'','')    
+        name_tokens = row['name_tokens']   
         
         macro = row['macro']
         if macro != None:
@@ -268,14 +266,19 @@ def to_sql(frame, output_file):
             if macro != '':
                 macro = macro.replace('\'','')
 
-        exp = row['exp'] 
+        exp = row['exp'].replace('\'','') 
         exp_tokens =  row['exp_tokens'] 
 
-        role = row['role']
+        role = row['role'].replace('\'','')
         role_tokens = row['role_tokens']
 
-        actor = row['actor']
+        actor = row['actor'].replace('\'','')  
         priority = row['priority']    
+
+        if priority == '':
+            priority = 'NULL'
+        else:
+            priority = int(priority)    
         
         is_online = row['is_online']     
 
@@ -285,27 +288,63 @@ def to_sql(frame, output_file):
 
         role_tokens_str = tt.tokens_to_str(role_tokens)
 
-        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
-            id,
-            diag_id, 
-            ind_id,
-            name,
-            name_tokens_str,
-            macro,
-            exp,
-            exp_tokens_str,
-            role,
-            role_tokens_str,
-            actor,
-            priority,
-            is_online
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        if diag_id == '':
+            string_value = '''({},NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                role,
+                role_tokens_str,
+                actor,
+                priority,
+                is_online
             )
-        values.append(string_value)     
+            values.append(string_value)
+        
+        elif ind_id == '':
+            string_value = '''({},\'{}\',NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                diag_id, 
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                role,
+                role_tokens_str,
+                actor,
+                priority,
+                is_online
+            )
+            values.append(string_value)
+        else:    
+            string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                diag_id, 
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                role,
+                role_tokens_str,
+                actor,
+                priority,
+                is_online
+            )
+            values.append(string_value)     
 
     with open(output_file, 'w') as new_file:
         for index, value in enumerate(values):
             if index == 0:
-                print('INSERT INTO country_need VALUES {},'.format(value), file=new_file)
+                print('INSERT INTO country_needs VALUES {},'.format(value), file=new_file)
             elif index == len(values) - 1:
                 print('''{};'''.format(value), file=new_file)
             else:

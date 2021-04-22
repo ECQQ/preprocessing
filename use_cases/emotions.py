@@ -6,6 +6,7 @@ import re, os
 
 
 def get_dialogues_info(frame):
+    
     frame = frame.replace("'",'"')
     question_cols = [x for x in frame.columns if re.search(r'P1_\d_[A|B]', x)]
 
@@ -40,6 +41,8 @@ def get_dialogues_info(frame):
     cond  = ~df_emo['name'].isna()
     df_emo = df_emo[cond]
     df_emo = df_emo.replace({'nr':''})
+
+    df_emo['diag_id'] = tt.to_unicode(df_emo['diag_id'])
     return df_emo
 
 def get_individual_info(frame_path, frame_online):    
@@ -96,10 +99,9 @@ def to_sql(frame, output_file):
     values = list()
 
     for index, row in frame.iterrows():
-        id = row['id']
-        diag_id = row['diag_id']
-        ind_id = row['ind_id']
-        name = row['name']
+        id = row['id']        
+        
+        name = row['name'].replace('\'','')
         name_tokens = row['name_tokens']       
         
         macro = row['macro']
@@ -109,7 +111,7 @@ def to_sql(frame, output_file):
             if macro != '':
                 macro = macro.replace('\'','')
 
-        exp = row['exp'] 
+        exp = row['exp'].replace('\'','') 
         exp_tokens =  row['exp_tokens'] 
         
         is_online = row['is_online']     
@@ -118,23 +120,51 @@ def to_sql(frame, output_file):
 
         exp_tokens_str = tt.tokens_to_str(exp_tokens)
 
-        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
-            id,
-            diag_id, 
-            ind_id,
-            name,
-            name_tokens_str,
-            macro,
-            exp,
-            exp_tokens_str,
-            is_online
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        if diag_id == '':
+            string_value = '''({},NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+                id,                 
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                is_online
             )
-        values.append(string_value)     
+            values.append(string_value)
+        
+        elif ind_id == '':
+            string_value = '''({},\'{}\',NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+                id,                 
+                diag_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                is_online
+            )
+            values.append(string_value)
+        else:    
+            string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+                id,
+                diag_id, 
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                is_online
+                )
+            values.append(string_value)     
 
     with open(output_file, 'w') as new_file:
         for index, value in enumerate(values):
             if index == 0:
-                print('INSERT INTO emotion VALUES {},'.format(value), file=new_file)
+                print('INSERT INTO emotions VALUES {},'.format(value), file=new_file)
             elif index == len(values) - 1:
                 print('''{};'''.format(value), file=new_file)
             else:

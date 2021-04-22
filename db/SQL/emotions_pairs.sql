@@ -1,4 +1,4 @@
-CREATE TABLE emotion_pairs
+CREATE TABLE emotions_pairs
 (
 	id integer PRIMARY KEY,
 	emotion_id integer references emotions(id),

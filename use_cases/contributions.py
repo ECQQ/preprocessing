@@ -23,6 +23,8 @@ def get_dialogues_info(frame):
         table = pd.concat(frames)
         table = table[['diag_id', 'text']]
 
+    table['diag_id'] = tt.to_unicode(table['diag_id'])
+
     return table
 
 def get_individuals_info(frame, frame_online):
@@ -67,8 +69,6 @@ def to_sql(frame, output_file):
 
     for index, row in frame.iterrows():
         id = row['id']
-        diag_id = row['diag_id']
-        ind_id = row['ind_id']
         text = row['text'].replace('\'','')
         is_online = row['is_online']
         
@@ -82,23 +82,47 @@ def to_sql(frame, output_file):
 
         tokens = row['tokens']
 
-        tokens_str = tt.tokens_to_str(tokens)
+        tokens_str = tt.tokens_to_str(tokens) 
 
-        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
-            id,
-            diag_id, 
-            ind_id,
-            text, 
-            tokens_str, 
-            macro,
-            is_online
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        if diag_id == '':
+            string_value = '''({},NULL,\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+                id,
+                ind_id,
+                text, 
+                tokens_str, 
+                macro,
+                is_online
             )
-        values.append(string_value)     
+            values.append(string_value)  
+        
+        elif ind_id == '':
+            string_value = '''({},\'{}\',NULL,\'{}\',\'{}\',\'{}\',{})'''.format(
+                id,
+                diag_id, 
+                text, 
+                tokens_str, 
+                macro,
+                is_online
+            )
+            values.append(string_value)  
+        else:    
+            string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{})'''.format(
+                id,
+                diag_id, 
+                ind_id,
+                text, 
+                tokens_str, 
+                macro,
+                is_online
+            )
+            values.append(string_value)  
 
     with open(output_file, 'w') as new_file:
         for index, value in enumerate(values):
             if index == 0:
-                print('INSERT INTO contribution VALUES {},'.format(value), file=new_file)
+                print('INSERT INTO contributions VALUES {},'.format(value), file=new_file)
             elif index == len(values) - 1:
                 print('''{};'''.format(value), file=new_file)
             else:

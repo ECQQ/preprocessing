@@ -24,6 +24,7 @@ def get_dialogues_info(frame):
     needs['macro'] = needs['name']
     diag_groups = needs.groupby('diag_id')
     needs['priority'] = [i for g, f in diag_groups for i in range(f.shape[0])]
+    needs['priority'] = needs['priority'].astype(int)
     needs    = needs[['diag_id', 'name', 'name_tokens',
     'exp', 'exp_tokens', 'macro', 'priority']]
     needs = needs[~needs['name'].isna()]
@@ -85,9 +86,13 @@ def create_table_personal_needs(frame, indv_frame, indv_online_frame):
     need_table = need_table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
     need_table = need_table[need_table['name'] != '']
     need_table['id'] = range(0, need_table.shape[0])
+    need_table['priority'] = need_table['priority'].astype(int)
+    need_table['diag_id'] = tt.to_unicode(need_table['diag_id'])
     need_table = need_table[['id', 'diag_id', 'ind_id', 'name', 'name_tokens',
                              'exp', 'exp_tokens', 'macro', 'priority',
                              'is_online']]
+
+    need_table = need_table.drop(need_table[(need_table['diag_id'] == '') & (need_table['ind_id'] == '')].index)                         
     return need_table
 
 def to_sql(frame, output_file):
@@ -97,7 +102,7 @@ def to_sql(frame, output_file):
         id = row['id']
         diag_id = row['diag_id']
         ind_id = row['ind_id']
-        name = row['name']
+        name = row['name'].replace('\'','')
         name_tokens = row['name_tokens']       
         
         macro = row['macro']
@@ -107,7 +112,7 @@ def to_sql(frame, output_file):
             if macro != '':
                 macro = macro.replace('\'','')
 
-        exp = row['exp'] 
+        exp = row['exp'].replace('\'','') 
         exp_tokens =  row['exp_tokens'] 
 
         priority = row['priority']    
@@ -118,24 +123,52 @@ def to_sql(frame, output_file):
 
         exp_tokens_str = tt.tokens_to_str(exp_tokens)
 
-        string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
-            id,
-            diag_id, 
-            ind_id,
-            name,
-            name_tokens_str,
-            macro,
-            exp,
-            exp_tokens_str,
-            priority,
-            is_online
+        if diag_id == '':
+            string_value = '''({},NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                priority,
+                is_online
             )
-        values.append(string_value)     
+            values.append(string_value)  
+        
+        elif ind_id == '':
+            string_value = '''({},\'{}\',NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                diag_id, 
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                priority,
+                is_online
+            )
+            values.append(string_value)  
+        else:    
+            string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                diag_id, 
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                priority,
+                is_online
+            )
+            values.append(string_value)  
 
     with open(output_file, 'w') as new_file:
         for index, value in enumerate(values):
             if index == 0:
-                print('INSERT INTO personal_need VALUES {},'.format(value), file=new_file)
+                print('INSERT INTO personal_needs VALUES {},'.format(value), file=new_file)
             elif index == len(values) - 1:
                 print('''{};'''.format(value), file=new_file)
             else:
