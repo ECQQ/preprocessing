@@ -22,5 +22,5 @@ WHERE
 	n.ind_id = d.id and
 	w.emotion_id = n.id and
 	w.word_1 IN 
-		(SELECT tnw.word_1 from top_personal_need_dialogues as tnw where tnw.macro = n.macro) AND
-	w.word_2 IN (SELECT tnw.word_1 from top_personal_need_dialogues as tnw where tnw.macro = n.macro)
+		(SELECT tnw.word_1 from top_personal_need_dialogues as tnw where tnw.macro = n.name) AND
+	w.word_2 IN (SELECT tnw.word_1 from top_personal_need_dialogues as tnw where tnw.macro = n.name)

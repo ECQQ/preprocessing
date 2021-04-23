@@ -2,7 +2,7 @@ CREATE VIEW country_needs_role_dialogues_pairs_view AS
 SELECT 
 	d.id, 
 	d.date, 
-	n.macro,
+	n.name,
 	n.actor,
 	regions.iso as region_iso, 
 	regions.name as region_name, 
@@ -22,5 +22,5 @@ WHERE
 	n.diag_id = d.id and
 	w.country_need_id = n.id and
 	w.word_1 IN 
-		(SELECT tnw.word_1 from top_country_need_role_dialogues as tnw where tnw.macro = n.macro) AND
-	w.word_2 IN (SELECT tnw.word_1 from top_country_need_role_dialogues as tnw where tnw.macro = n.macro)
+		(SELECT tnw.word_1 from top_country_need_role_dialogues as tnw where tnw.macro = n.name) AND
+	w.word_2 IN (SELECT tnw.word_1 from top_country_need_role_dialogues as tnw where tnw.macro = n.name)
