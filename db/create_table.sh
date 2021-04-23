@@ -2,7 +2,6 @@
 
 # Crea las tablas de emociones y contribuciones definidas en SQL_TOP_TABLES
 
-
 puerto=5432
 rol=superset
 db=ecqq2
@@ -22,11 +21,65 @@ echo "Copiando archivos al contenedor"
 	
 docker cp CSV superset_db:/data
 
-tables=(regions comunas dialogues individuals persons persons_dialogues emotions contributions country_needs personal_needs emotions_pairs country_needs_exp_pairs country_needs_role_pairs personal_needs_pairs)
+tables=(
+	regions 
+	comunas 
+	dialogues
+	individuals
+	persons
+	persons_dialogues
+	emotions
+	contributions
+	country_needs
+	personal_needs
+	emotions_pairs
+	country_needs_exp_pairs
+	country_needs_role_pairs
+	personal_needs_pairs
+)
 
-# views=(person_view contribution_view need_view top_10_con_view top_50_con_view top_10_emo_view top_50_emo_view top_need_exp_view top_need_role_view con_dialogue_view emo_dialogue_view need_exp_dialogue_view need_role_dialogue_view dialogue_view)
+views=(
+	contributions_dialogues_view
+	contributions_individuals_view
+	country_needs_dialogue_view
+	country_needs_exp_dialogues_pairs_view
+	country_needs_exp_individuals_pairs_view
+	country_needs_individuals_view
+	country_needs_role_dialogues_pairs_view
+	country_needs_role_individuals_pairs_view
+	dialogues_view
+	emotions_dialogues_pairs_view
+	emotions_dialogue_view
+	emotions_individuals_pairs_view
+	emotions_individuals_view
+	individuals_view
+	personal_needs_dialogues_pairs_view
+	personal_needs_dialogue_view
+	personal_needs_individuals_pairs_view
+	personal_needs_individuals_view
+	persons_view
+)
 
-# tops=(top_10_con_table top_10_emo_table top_50_con_table top_50_emo_table top_10_need_macro_table top_need_word_table)
+tops=(
+	top_10_contributions_dialogues
+	top_10_contributions_individuals
+	top_10_country_needs_dialogues
+	top_10_country_needs_individuals
+	top_10_emotions_dialogues
+	top_10_emotions_individuals
+	top_10_personal_needs_dialogues
+	top_10_personal_needs_individuals
+	top_50_contributions_dialogues
+	top_50_contributions_individuals
+	top_50_country_needs_dialogues
+	top_50_country_needs_individuals
+	top_50_emotions_dialogues
+	top_50_emotions_individuals
+	top_50_personal_needs_dialogues
+	top_50_personal_needs_individuals
+	top_need_words_dialogues
+	top_need_words_individuals
+)
 
 for file in "${tables[@]}"; do
 	echo "creando tabla $file"
@@ -47,15 +100,15 @@ for file in "${tables[@]}"; do
 	fi
 done
 
-# for file in "${tops[@]}"; do
-# 	echo "creando tabla $file"
-# 	top=$(cat SQL_TOP_TABLES/$file.sql)
-# 	docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -c "$top"		
-# done
+for file in "${tops[@]}"; do
+	echo "creando tabla $file"
+	top=$(cat SQL_TOP_TABLES/$file.sql)
+	docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -c "$top"		
+done
 
-# for file in "${views[@]}"; do
-# 	echo "creando vista $file"
-# 	view=$(cat VIEWS_SQL/$file.sql)
-# 	docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -c "$view"		
-# done
+for file in "${views[@]}"; do
+	echo "creando vista $file"
+	view=$(cat VIEWS_SQL/$file.sql)
+	docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -c "$view"		
+done
 
