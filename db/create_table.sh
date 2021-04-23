@@ -77,8 +77,14 @@ tops=(
 	top_50_emotions_individuals
 	top_50_personal_needs_dialogues
 	top_50_personal_needs_individuals
-	top_need_words_dialogues
-	top_need_words_individuals
+	top_country_need_exp_dialogues
+	top_country_need_exp_individuals
+	top_country_need_role_dialogues
+	top_country_need_role_individuals
+	top_emotions_dialogues
+	top_emotions_individuals
+	top_personal_need_dialogues
+	top_personal_need_individuals
 )
 
 for file in "${tables[@]}"; do
