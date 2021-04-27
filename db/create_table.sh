@@ -18,8 +18,9 @@ docker exec -it superset_db psql -h localhost -p $puerto -U $rol -c "CREATE DATA
 docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db  -c "ALTER DATABASE $db SET datestyle TO \"ISO, DMY\";"
 	
 echo "Copiando archivos al contenedor"
-	
+
 docker cp CSV superset_db:/data
+docker cp SQL_INSERT superset_db:/data
 
 tables=(
 	regions 
@@ -37,6 +38,7 @@ tables=(
 	country_needs_role_pairs
 	personal_needs_pairs
 )
+
 
 views=(
 	contributions_dialogues_view
@@ -89,17 +91,17 @@ tops=(
 
 for file in "${tables[@]}"; do
 	echo "creando tabla $file"
-	table=$(cat SQL/$file.sql)
+	table=$(cat SQL_SCHEMA/$file.sql)
 	docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -c "$table"
 	echo "poblando $file"	
 	if [[ "$file" == "contributions" ]]; then
-		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/CSV/contributions.sql
+		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/SQL_INSERT/contributions.sql
 	elif [[ "$file" == "country_needs" ]]; then
-		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/CSV/country_needs.sql	
+		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/SQL_INSERT/country_needs.sql	
 	elif [[ "$file" == "personal_needs" ]]; then
-		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/CSV/personal_needs.sql	
+		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/SQL_INSERT/personal_needs.sql	
 	elif [[ "$file" == "emotions" ]]; then
-		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/CSV/emotions.sql			
+		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db -f /data/SQL_INSERT/emotions.sql			
 	else
 		csv_query="COPY $file FROM '/data/CSV/$file.csv' WITH DELIMITER ',' CSV HEADER;"	
 		docker exec -it superset_db psql -h localhost -p $puerto -U $rol $db  -c "$csv_query"	
