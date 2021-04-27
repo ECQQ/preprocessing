@@ -4,6 +4,7 @@ data/*.xlsx
 data/*.csv
 db/CSV/*
 db/CSV.zip
+db/data.zip
 __pycache__/
 credentials.json
 token.pickle
