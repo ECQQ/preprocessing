@@ -5,6 +5,7 @@ CREATE TABLE individuals
 	age integer,
     comuna_id integer REFERENCES comunas(id),
 	level varchar(64),
+	is_valid Boolean,
 	age_range varchar(5),
 	online Boolean
 );
