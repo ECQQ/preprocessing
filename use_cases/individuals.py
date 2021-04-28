@@ -45,7 +45,7 @@ def empty_ids(x, col):
         x[col] = str(uuid.uuid4())
     return x
 
-def create_table_individuals(online_survey, digi_survey):
+def create_table_individuals(online_survey, digi_survey, filter_digitilized_individual):
     # Init Pipeline
     online_survey['RUN'] = online_survey['RUN'].replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
     online = online_survey.apply(lambda x: empty_ids(x, 'RUN'), 1)
@@ -71,26 +71,35 @@ def create_table_individuals(online_survey, digi_survey):
     online = stratify_frame_by_age(online)
     online = online.replace({0:'', 'nan':'', 'nr':''})
 
+    online['is_valid'] = True
+
     # ============================================
     # Getting information from digitalized individuals rows
     # ============================================
     digi.drop_duplicates(subset='id', inplace=True)
+    filter_digitilized_individual.drop_duplicates(subset='id', inplace=True)
+    filter_digitilized_individual[['id', 'Valida Fin']]
+    digi = digi.merge(filter_digitilized_individual, how='left', on='id')
+
 
     digi = digi.apply(lambda x: fix_location(x), 1)
     digi = digi.apply(lambda x: get_age(x, 'edad'), 1)
     digi = digi.apply(lambda x: format_date(x, 'fecha encuesta'), 1)
     digi['educ_entrevistado'] = digi['educ_entrevistado'].replace(educ_dic)
 
-    digi = digi[['id', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado']]
+    digi = digi[['id', 'fecha encuesta','edad', 'comuna', 'educ_entrevistado', 'Valida Fin']]
     
-    digi.columns = ['id', 'date', 'age', 'comuna_id', 'level']
+    digi.columns = ['id', 'date', 'age', 'comuna_id', 'level', 'is_valid']
 
+    
     digi = digi[~digi['age'].isna()]
     digi['age'] = digi['age'].apply(lambda x: x[:2])
     digi['age'] = digi['age'].astype(int)
     digi = stratify_frame_by_age(digi)
     digi = digi.replace({0:'', 'nan':'', 'nr':''})
     digi['online'] = False
+    digi['is_valid'] = digi['is_valid'].apply(lambda x: bool(x))
+
 
     concat = pd.concat([digi, online]).reset_index().iloc[:, 1:]
 
