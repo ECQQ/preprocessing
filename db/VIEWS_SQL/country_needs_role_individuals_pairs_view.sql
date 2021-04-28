@@ -7,7 +7,8 @@ SELECT
 	n.actor,
 	regions.iso as region_iso, 
 	regions.name as region_name, 
-	regions.numero as region_number, 
+	regions.numero as region_number,
+	regions.orden as region_order,  
 	comunas.name as comuna_name,
 	w.word_1,
 	w.word_2

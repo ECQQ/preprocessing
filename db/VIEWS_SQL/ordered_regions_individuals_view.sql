@@ -1,5 +1,6 @@
-CREATE VIEW individuals_view AS
-SELECT 
+CREATE VIEW ordered_regions_individuals_view AS
+
+SELECT region_name, COUNT(*) FROM (SELECT 
         individuals.id
         age,
         level as education,
@@ -17,4 +18,6 @@ FROM
         individuals
 WHERE 
         individuals.comuna_id = comunas.id and 
-        comunas.region_iso = regions.iso 
+        comunas.region_iso = regions.iso) as foo 
+GROUP BY region_name, region_order  
+ORDER BY region_order

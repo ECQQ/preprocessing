@@ -55,6 +55,9 @@ views=(
 	emotions_individuals_pairs_view
 	emotions_individuals_view
 	individuals_view
+	ordered_regions_dialogues_view
+	ordered_regions_individuals_view
+	ordered_regions_person
 	personal_needs_dialogues_pairs_view
 	personal_needs_dialogue_view
 	personal_needs_individuals_pairs_view

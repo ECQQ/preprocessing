@@ -1,6 +1,6 @@
-CREATE VIEW persons_view AS
+CREATE VIEW ordered_regions_person_view AS
 
-SELECT 
+SELECT region_name, COUNT(*) FROM (SELECT 
         persons.id as person_id,
         dialogues.id as diag_id,
         age,
@@ -10,7 +10,7 @@ SELECT
         regions.iso as region_iso, 
         regions.name as region_name, 
         regions.numero as region_number,
-	regions.orden as region_order, 
+	      regions.orden as region_order, 
         comunas.name as comuna_name,
         dialogues.date as date 
 
@@ -24,4 +24,6 @@ WHERE
         persons.comuna = comunas.id and 
         comunas.region_iso = regions.iso and
         persons.id = persons_dialogues.person_id and
-        dialogues.id = persons_dialogues.diag_id;
+        dialogues.id = persons_dialogues.diag_id) as foo
+GROUP BY region_name, region_order  
+ORDER BY region_order

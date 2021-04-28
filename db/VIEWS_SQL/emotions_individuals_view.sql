@@ -7,7 +7,8 @@ SELECT
 	e.name as macro,
 	regions.iso as region_iso, 
 	regions.name as region_name, 
-	regions.numero as region_number, 
+	regions.numero as region_number,
+	regions.orden as region_order, 
 	comunas.name as comuna_name
 FROM 
 	comunas,
