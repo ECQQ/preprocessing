@@ -23,22 +23,21 @@ docker cp CSV superset_db:/data
 docker cp SQL_INSERT superset_db:/data
 
 tables=(
-	regions 
-	comunas 
-	dialogues
-	individuals
+	regions
+	comunas	
 	persons
+	individuals
+	dialogues
 	persons_dialogues
-	emotions
 	contributions
 	country_needs
-	personal_needs
-	emotions_pairs
 	country_needs_exp_pairs
 	country_needs_role_pairs
-	personal_needs_pairs
+	emotions	
+	emotions_pairs
+	personal_needs	
+	personal_needs_pairs		
 )
-
 
 views=(
 	contributions_dialogues_view
@@ -51,13 +50,10 @@ views=(
 	country_needs_role_individuals_pairs_view
 	dialogues_view
 	emotions_dialogues_pairs_view
-	emotions_dialogue_view
+	emotions_dialogues_view
 	emotions_individuals_pairs_view
 	emotions_individuals_view
 	individuals_view
-	ordered_regions_dialogues_view
-	ordered_regions_individuals_view
-	ordered_regions_person
 	personal_needs_dialogues_pairs_view
 	personal_needs_dialogue_view
 	personal_needs_individuals_pairs_view
@@ -66,28 +62,20 @@ views=(
 )
 
 tops=(
-	top_10_contributions_dialogues
-	top_10_contributions_individuals
 	top_10_country_needs_dialogues
 	top_10_country_needs_individuals
-	top_10_emotions_dialogues
-	top_10_emotions_individuals
 	top_10_personal_needs_dialogues
 	top_10_personal_needs_individuals
-	top_50_contributions_dialogues
-	top_50_contributions_individuals
-	top_50_country_needs_dialogues
-	top_50_country_needs_individuals
-	top_50_emotions_dialogues
-	top_50_emotions_individuals
-	top_50_personal_needs_dialogues
-	top_50_personal_needs_individuals
+	top_contributions_dialogues
+	top_contributions_individuals
 	top_country_need_exp_dialogues
 	top_country_need_exp_individuals
 	top_country_need_role_dialogues
 	top_country_need_role_individuals
 	top_emotions_dialogues
 	top_emotions_individuals
+	top_emotions_pairs_dialogues
+	top_emotions_pairs_individuals
 	top_personal_need_dialogues
 	top_personal_need_individuals
 )

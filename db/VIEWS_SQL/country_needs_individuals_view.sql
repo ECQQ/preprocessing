@@ -1,9 +1,12 @@
 CREATE VIEW country_needs_individuals_view as 
 SELECT 
-	d.id, 
-	d.date, 
-	-- d.valid,
-	d.online,
+	ind.id, 
+	ind.date, 
+	ind.online,
+	ind.age,
+	ind.level as education,
+	ind.age_range, 
+	ind.is_valid,
 	cn.macro,
 	cn.name,
 	cn.role,
@@ -18,8 +21,8 @@ FROM
 	comunas,
 	regions,
 	country_needs as cn, 
-	individuals as d
+	individuals as ind
 WHERE
-	d.comuna_id = comunas.id and 
+	ind.comuna_id = comunas.id and 
 	comunas.region_iso = regions.iso and
-	cn.ind_id = d.id
+	cn.ind_id = ind.id

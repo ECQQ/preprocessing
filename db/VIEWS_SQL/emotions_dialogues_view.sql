@@ -1,12 +1,8 @@
-CREATE VIEW emotions_individuals_view AS
+CREATE VIEW emotions_dialogue_view AS
 SELECT 
-	ind.id, 
-	ind.date, 
-	ind.online,
-	ind.age,
-	ind.level as education,
-	ind.age_range, 
-	ind.is_valid,
+	d.id, 
+	d.date, 
+	d.valid,
 	e.macro,
 	regions.iso as region_iso, 
 	regions.name as region_name, 
@@ -17,9 +13,9 @@ FROM
 	comunas,
 	regions,
 	emotions as e, 
-	individuals as ind
+	dialogues as d
 WHERE
-	ind.comuna_id = comunas.id and 
+	d.comuna = comunas.id and 
 	comunas.region_iso = regions.iso and
-	e.ind_id = ind.id and
+	e.diag_id = d.id and
 	e.macro <> ''

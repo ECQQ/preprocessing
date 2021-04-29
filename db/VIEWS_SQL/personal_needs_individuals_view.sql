@@ -1,9 +1,12 @@
 CREATE VIEW personal_needs_individuals_view as 
 SELECT 
-	d.id, 
-	d.date, 
-	d.online,
-	-- d.valid,
+	ind.id, 
+	ind.date, 
+	ind.online,
+	ind.age,
+    ind.level as education,
+    ind.age_range, 
+	ind.is_valid,
 	pn.macro,
 	pn.name,
 	pn.priority,
@@ -16,8 +19,8 @@ FROM
 	comunas,
 	regions,
 	personal_needs as pn, 
-	individuals as d
+	individuals as ind
 WHERE
-	d.comuna_id = comunas.id and 
+	ind.comuna_id = comunas.id and 
 	comunas.region_iso = regions.iso and
-	pn.ind_id = d.id
+	pn.ind_id = ind.id

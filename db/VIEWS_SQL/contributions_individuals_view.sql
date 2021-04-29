@@ -1,9 +1,12 @@
 CREATE VIEW contributions_individuals_view AS
 SELECT 
-	d.id, 
-	d.date,
-	d.online,
-	-- d.valid,
+	ind.id, 
+	ind.date,
+	ind.online,
+	ind.age,
+	ind.level as education,
+	ind.age_range, 
+	ind.is_valid,
 	c.macro,
 	regions.iso as region_iso, 
 	regions.name as region_name, 
@@ -14,8 +17,9 @@ FROM
 	comunas,
 	regions,
 	contributions as c, 
-	individuals as d
+	individuals as ind
 WHERE 
-	d.comuna_id = comunas.id and 
+	ind.comuna_id = comunas.id and 
 	comunas.region_iso = regions.iso and
-	c.ind_id = d.id
+	c.ind_id = ind.id and
+	c.macro <> ''

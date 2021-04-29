@@ -4,6 +4,7 @@ SELECT
         age,
         level as education,
         age_range, 
+        is_valid,
         individuals.date,
         regions.iso as region_iso, 
         regions.name as region_name, 

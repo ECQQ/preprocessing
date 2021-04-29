@@ -2,7 +2,7 @@ CREATE VIEW emotions_dialogues_pairs_view AS
 SELECT 
 	d.id, 
 	d.date, 
-	n.macro,
+	e.macro,
 	regions.iso as region_iso, 
 	regions.name as region_name, 
 	regions.numero as region_number,
@@ -13,14 +13,14 @@ SELECT
 FROM
 	comunas,
 	regions,
-	emotions as n, 
+	emotions as e, 
 	dialogues as d,
 	emotions_pairs as w
 WHERE 
 	d.comuna = comunas.id and 
 	comunas.region_iso = regions.iso and
-	n.diag_id = d.id and
-	w.emotion_id = n.id and
+	e.diag_id = d.id and
+	w.emotion_id = e.id and
 	w.word_1 IN 
-		(SELECT tnw.word_1 from top_personal_need_dialogues as tnw where tnw.macro = n.macro) AND
-	w.word_2 IN (SELECT tnw.word_1 from top_personal_need_dialogues as tnw where tnw.macro = n.macro)
+		(SELECT tnw.word_1 from top_emotions_pairs_dialogues as tnw where tnw.macro = e.macro) AND
+	w.word_2 IN (SELECT tnw.word_1 from top_emotions_pairs_dialogues as tnw where tnw.macro = e.macro)

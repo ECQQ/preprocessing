@@ -1,8 +1,12 @@
 CREATE VIEW country_needs_role_individuals_pairs_view AS
 SELECT 
-	d.id, 
-	d.date, 
-	d.online,
+	ind.id, 
+	ind.date, 
+	ind.online,
+	ind.age,
+	ind.level as education,
+	ind.age_range, 
+	ind.is_valid,
 	n.name,
 	n.actor,
 	regions.iso as region_iso, 
@@ -16,12 +20,12 @@ FROM
 	comunas,
 	regions,
 	country_needs as n, 
-	individuals as d,
+	individuals as ind,
 	country_needs_role_pairs as w
 WHERE 
-	d.comuna_id = comunas.id and 
+	ind.comuna_id = comunas.id and 
 	comunas.region_iso = regions.iso and
-	n.ind_id = d.id and
+	n.ind_id = ind.id and
 	w.country_need_id = n.id and
 	w.word_1 IN 
 		(SELECT tnw.word_1 from top_country_need_role_individuals as tnw where tnw.macro = n.name) AND

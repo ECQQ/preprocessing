@@ -17,4 +17,5 @@ FROM
 WHERE 
 	d.comuna = comunas.id and 
 	comunas.region_iso = regions.iso and
-	c.diag_id = d.id
+	c.diag_id = d.id and
+	c.macro <> ''
