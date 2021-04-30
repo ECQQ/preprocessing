@@ -27,5 +27,5 @@ WHERE
 	n.ind_id = ind.id and
 	w.personal_need_id = n.id and
 	w.word_1 IN 
-		(SELECT tnw.word_1 from top_personal_need_individuals as tnw where tnw.macro = n.macro) AND
-	w.word_2 IN (SELECT tnw.word_1 from top_personal_need_individuals as tnw where tnw.macro = n.macro)
+		(SELECT tnw.word_1 from top_personal_needs_pairs_individuals as tnw where tnw.macro = n.macro) AND
+	w.word_2 IN (SELECT tnw.word_1 from top_personal_needs_pairs_individuals as tnw where tnw.macro = n.macro)

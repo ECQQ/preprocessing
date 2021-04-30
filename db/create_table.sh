@@ -64,8 +64,8 @@ views=(
 tops=(
 	top_10_country_needs_dialogues
 	top_10_country_needs_individuals
-	top_10_personal_needs_dialogues
-	top_10_personal_needs_individuals
+	top_personal_needs_dialogues
+	top_personal_needs_individuals
 	top_contributions_dialogues
 	top_contributions_individuals
 	top_country_need_exp_dialogues
@@ -76,8 +76,8 @@ tops=(
 	top_emotions_individuals
 	top_emotions_pairs_dialogues
 	top_emotions_pairs_individuals
-	top_personal_need_dialogues
-	top_personal_need_individuals
+	top_personal_needs_pairs_dialogues
+	top_personal_needs_pairs_individuals
 )
 
 for file in "${tables[@]}"; do
