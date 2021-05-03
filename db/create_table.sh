@@ -62,16 +62,16 @@ views=(
 )
 
 tops=(
-	top_10_country_needs_dialogues
-	top_10_country_needs_individuals
+	top_country_needs_dialogues
+	top_country_needs_individuals
 	top_personal_needs_dialogues
 	top_personal_needs_individuals
 	top_contributions_dialogues
 	top_contributions_individuals
-	top_country_need_exp_dialogues
-	top_country_need_exp_individuals
-	top_country_need_role_dialogues
-	top_country_need_role_individuals
+	top_country_needs_exp_pairs_dialogues
+	top_country_needs_exp_pairs_individuals
+	top_country_needs_role_pairs_dialogues
+	top_country_needs_role_pairs_individuals
 	top_emotions_dialogues
 	top_emotions_individuals
 	top_emotions_pairs_dialogues

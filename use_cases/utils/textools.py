@@ -19,6 +19,16 @@ from google.auth.transport.requests import Request
 
 nltk.download('stopwords')
 
+def str_to_int(x):
+    try:
+        x = int(float(x))
+    except ValueError:
+        if x == '0.0':
+            x = 0
+        else:
+            x = ''
+    return x            
+
 def check_string(x):
     if len(str(x)) <=1:
         x = ''

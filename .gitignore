@@ -3,8 +3,8 @@ data/.~lock*
 data/*.xlsx
 data/*.csv
 db/CSV/*
-db/CSV.zip
-db/data.zip
+db/SQL_INSERT
+db/*.zip
 __pycache__/
 credentials.json
 token.pickle
