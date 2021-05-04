@@ -23,6 +23,9 @@ docker cp CSV superset_db:/data
 docker cp SQL_INSERT superset_db:/data
 
 tables=(
+	compromisos_nna
+	necesidades_nna
+	propuestas_nna
 	regions
 	comunas	
 	persons
@@ -40,6 +43,7 @@ tables=(
 )
 
 views=(
+	necesidades_nna_view
 	contributions_dialogues_view
 	contributions_individuals_view
 	country_needs_dialogue_view
