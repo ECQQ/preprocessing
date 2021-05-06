@@ -1,6 +1,6 @@
 CREATE VIEW individuals_view AS
 SELECT 
-        individuals.id
+        individuals.id,
         age,
         level as education,
         age_range, 

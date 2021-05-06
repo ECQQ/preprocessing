@@ -76,7 +76,7 @@ def create_table_persons(frame):
 		table_cols.append(dist)
 	table = pd.concat(table_cols)
 
-	table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+	table = tt.eliminate_nrs(table)
 
 	table['remove'] = False
 	table = table.apply(lambda x: invalid_person(x), 1)

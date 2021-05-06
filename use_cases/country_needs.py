@@ -240,7 +240,7 @@ def create_table_country_needs(diag_frame, ind_survey, indiv_path, online_path):
     need_table = pd.concat([needs, needs_i])
 
     need_table = need_table.fillna('')
-    need_table = need_table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    need_table = tt.eliminate_nrs(need_table)
     need_table = need_table[need_table['name'] != '']
     need_table['id'] = range(0, need_table.shape[0])
 

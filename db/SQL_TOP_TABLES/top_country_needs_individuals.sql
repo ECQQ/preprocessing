@@ -4,4 +4,4 @@ SELECT cn.macro
 FROM country_needs as cn
 WHERE ind_id IS NOT null and cn.macro <> ''
 GROUP BY cn.macro 
-ORDER BY COUNT(*);
+ORDER BY COUNT(*) DESC LIMIT 10;

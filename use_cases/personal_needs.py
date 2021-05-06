@@ -83,7 +83,7 @@ def create_table_personal_needs(frame, indv_frame, indv_online_frame):
     need_table = pd.concat([need_diag, need_ind])
 
     need_table = need_table.fillna('')
-    need_table = need_table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    need_table = tt.eliminate_nrs(need_table)
     need_table = need_table[need_table['name'] != '']
     need_table['id'] = range(0, need_table.shape[0])
     need_table['priority'] = need_table['priority'].astype(int)

@@ -43,7 +43,7 @@ tables=(
 )
 
 views=(
-	necesidades_nna_view
+	total_dialogos_nna
 	contributions_dialogues_view
 	contributions_individuals_view
 	country_needs_dialogue_view

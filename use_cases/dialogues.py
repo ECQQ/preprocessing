@@ -24,7 +24,7 @@ def create_table_dialogues(frame, filter):
 
 
     new_frame = tt.to_unicode(new_frame)
-    new_frame = new_frame.replace({0:'', 'nan':'', 'nr':''})
+    new_frame = tt.eliminate_nrs(new_frame)
     new_frame = new_frame.rename(columns={'file_id':'diag_id'})
 
     new_frame.columns =['id', 'date', 'init_time', 'end_time',

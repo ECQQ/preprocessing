@@ -5,5 +5,5 @@ CREATE TABLE persons
 	sex varchar(5),
 	level varchar(64),
 	comuna integer REFERENCES comunas(id),
-	age_range varchar(5)	
+	age_range varchar(8)	
 );

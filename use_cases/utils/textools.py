@@ -19,6 +19,50 @@ from google.auth.transport.requests import Request
 
 nltk.download('stopwords')
 
+def eliminate_nrs(frame):
+    frame = frame.replace({
+        'nr':'',
+        'nan':'', 
+        'NR':'', 
+        'NaN':'', 
+        'nr ':'',
+        'nan ':'', 
+        'NR ':'', 
+        'NaN ':'', 
+        'nr ':'',
+        ' nan':'', 
+        ' NR':'', 
+        ' NaN':'', 
+        ' nr':'',
+        ' nan ':'', 
+        ' NR ':'', 
+        ' NaN ':'',
+        ' nr ':'',
+        np.nan:''}
+    )
+    return frame
+
+def last_sanity_check(frame, id , indexes = False, pass_cols = None):
+    nrs = [
+        'nr','nan','NR','NaN','nr ','nan ','NR ',
+        'NaN ','nr ',' nan',' NR',' NaN',' nr',
+        ' nan ',' NR ',' NaN ',' nr ',np.nan
+    ]
+    frame_copy = frame.copy()    
+    id_test = frame[frame[id] == '']
+    if indexes:
+        ind_diag_test = frame[(frame[indexes[0]] == '') & (frame[indexes[1]] == '')]
+    else:
+        ind_diag_test = []    
+
+    if pass_cols:
+        for col in pass_cols:   
+            frame_copy.drop(col, inplace=True, axis=1)         
+
+    testnr = frame_copy[frame_copy.isin(nrs).any(axis=1)]
+
+    return (id_test, ind_diag_test, testnr)
+
 def str_to_int(x):
     try:
         x = int(float(x))
@@ -67,8 +111,14 @@ def tokenize(column):
         # Remove stop words
         finds = [f for f in finds \
         if f not in stopwords.words('spanish')]
-        if finds == ['nr'] or finds == [] or finds==['nan']:
-            finds = 'NR'
+        if finds == ['nr'] or finds == [] or finds==['nan'] \
+           or finds == ['NR'] or finds == ['NaN'] or finds == [np.nan]:
+            finds = ''
+
+        #strip_tokens
+        for index, token in enumerate(finds):
+            finds[index] = token.strip()                   
+            
         return finds
 
     assert isinstance(column, pd.Series), \
@@ -267,10 +317,9 @@ def combine_versions(frame1, frame2, on='id_user', which=None):
 
 def stratify_frame_by_age(frame):
     # Stratify
-    etiquetas = ['{}-{}'.format(n, n+15) for n in range(0, 60, 15)]
-    etiquetas += ['>=60']
-    range_values = [i for i in range(0, 61, 15)]
-    range_values.append(100)
+    etiquetas = ['0 a 5', '6 a 14', '15 a 19', '20 a 25', '26 a 30', '31 a 39',
+                 '40 a 49', '50 a 59', '60 a 69', '70 o más']
+    range_values = [0, 6, 15, 20, 26, 31, 40, 50, 60, 70, 150]
     frame['age_range'] = pd.cut(frame['age'], range_values, right=False, labels=etiquetas)
     return frame
 
@@ -300,6 +349,7 @@ def tokens_to_str(tokens):
 
 def clean_alt_list(list_):
     list_ = str(list_)
+    list_ = list_.replace(' ','')
     list_ = list_.replace('[', '')
     list_ = list_.replace(']', '')
     list_ = list_.replace("'", '')

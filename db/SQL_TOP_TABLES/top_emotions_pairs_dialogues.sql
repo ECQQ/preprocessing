@@ -1,6 +1,6 @@
 CREATE TABLE top_emotions_pairs_dialogues (
     word_1 varchar(64),
-    macro varchar(128)
+    macro varchar(1024)
 );
 
 CREATE OR REPLACE FUNCTION getTop10EmotionsByMacroDialogues() RETURNS void AS $$

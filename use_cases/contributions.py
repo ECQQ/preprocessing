@@ -58,7 +58,7 @@ def create_table_contributions(frame, frame_ind, frame_online_ind):
     table['tokens'] = tt.tokenize(table['text'])
     table['macro'] = table['text']
     table = table.fillna('')
-    table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    table = tt.eliminate_nrs(table)
     table = table[table['text'] != '']
     table = table[['id', 'diag_id','ind_id', 'text', 'tokens',
                    'macro', 'is_online']]

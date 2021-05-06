@@ -5,7 +5,7 @@ import numpy as np
 import uuid
 
 from use_cases.utils.comunas import comuna_code, comunas_fix, fix_location, fix_location_online
-from use_cases.utils.textools import stratify_frame_by_age
+from use_cases.utils.textools import stratify_frame_by_age, eliminate_nrs
 educ_dic = {
     1 : 'Educación básica incompleta o inferior',
     2 : 'Básica completa',
@@ -96,7 +96,7 @@ def create_table_individuals(online_survey, digi_survey, filter_digitilized_indi
     digi['age'] = digi['age'].apply(lambda x: x[:2])
     digi['age'] = digi['age'].astype(int)
     digi = stratify_frame_by_age(digi)
-    digi = digi.replace({0:'', 'nan':'', 'nr':''})
+    digi = eliminate_nrs(digi)
     digi['online'] = False
     digi['is_valid'] = digi['is_valid'].apply(lambda x: bool(x))
 

@@ -87,7 +87,7 @@ def create_table_emotions(frame, frame_ind_path, frame_ind_online):
     table = pd.concat([emo_diag, ind_diag])
 
     table = table.fillna('')
-    table = table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    table = tt.eliminate_nrs(table)
     table = table[table['name'] != '']
     table['id'] = range(0, table.shape[0])
     table = table[['id', 'diag_id','ind_id','name',
