@@ -1,4 +1,4 @@
-CREATE VIEW necesidades_nna_view AS
+CREATE VIEW total_dialogos_nna AS
 SELECT DISTINCT 
     id_mesa,
     cantidad_participantes,
