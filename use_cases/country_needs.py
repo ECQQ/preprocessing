@@ -70,8 +70,13 @@ def get_roles(role_frame, fide, need, exp, prior, who='estado'):
 
     return tuples
 
+def fix_priority(x):
+    if x == 'urgencia (solo una)':
+        x = '' 
+
 
 def get_dialogues_info(frame):
+    frame = frame.replace("'",'"')
     frames = []
     for k in range(1, 6):
         need_0 = frame[['ID Archivo',
@@ -127,9 +132,14 @@ def get_dialogues_info(frame):
 def get_individuals_info(frame, indiv_path, online_path):
     ocols = [1]+list(range(12,21))+list(range(27,39))
     p4_online = pd.read_excel(online_path, 'Sheet1', usecols=ocols)
-    ocols = [1]+list(range(8, 21))
+    ocols = [1]+list(range(8, 21))    
+
     p4_handwritten = pd.read_excel(indiv_path, 'P4_ORDEN_CUESTIONARIO',
                                    usecols=ocols)
+
+    frame = frame.replace("'",'"')
+    p4_online = p4_online.replace("'",'"')
+    p4_handwritten = p4_handwritten.replace("'",'"')
 
     frames = []
     for i in range(1, 4):
@@ -160,6 +170,8 @@ def get_individuals_info(frame, indiv_path, online_path):
 
 
         online = pd.concat([online_a, online_b])
+
+        online['priority'] = online['priority'].apply(lambda x: fix_priority(x), 1)
 
         # ======== HANDWRITTEN ========
         handwritten = p4_handwritten[['correlativo_digitación',
@@ -196,8 +208,8 @@ def get_individuals_info(frame, indiv_path, online_path):
         handwritten = pd.merge(handwritten, handwritten_2,
                                how="outer", on=["name", "ind_id"])
 
-        handwritten['is_online'] = np.zeros(handwritten.shape[0])
-        online['is_online'] = np.ones(online.shape[0])
+        handwritten['is_online'] = False
+        online['is_online'] = True
 
         result = pd.concat([handwritten, online])
 
@@ -219,21 +231,122 @@ def get_individuals_info(frame, indiv_path, online_path):
 
 def create_table_country_needs(diag_frame, ind_survey, indiv_path, online_path):
 
+
     needs = get_dialogues_info(diag_frame)
+    needs['is_online'] = False
 
-    needs_i = get_individuals_info(ind_survey, indiv_path, online_path)
-
-    needs['is_online'] = np.zeros(needs.shape[0])
+    needs_i = get_individuals_info(ind_survey, indiv_path, online_path)   
 
     need_table = pd.concat([needs, needs_i])
-    need_table['is_online'] = need_table['is_online'].astype(int)
 
     need_table = need_table.fillna('')
-    need_table = need_table.replace({'nr':'','nan':'', 'NR':'', 'NaN':'', np.nan:''})
+    need_table = tt.eliminate_nrs(need_table)
     need_table = need_table[need_table['name'] != '']
     need_table['id'] = range(0, need_table.shape[0])
 
     need_table = need_table[['id', 'diag_id', 'ind_id', 'name', 'name_tokens',
                               'macro', 'exp', 'exp_tokens', 'role',
                               'role_tokens', 'actor', 'priority', 'is_online' ]]
+
+    need_table = need_table.drop(need_table[(need_table['diag_id'] == '') & (need_table['ind_id'] == '')].index)                              
     return need_table
+
+def to_sql(frame, output_file):
+    values = list()
+
+    for index, row in frame.iterrows():
+        id = row['id']
+        name = row['name'].replace('\'','')    
+        name_tokens = row['name_tokens']   
+        
+        macro = row['macro']
+        if macro != None:
+            if macro == '\'':
+                macro = ''
+            if macro != '':
+                macro = macro.replace('\'','')
+
+        exp = row['exp'].replace('\'','') 
+        exp_tokens =  row['exp_tokens'] 
+
+        role = row['role'].replace('\'','')
+        role_tokens = row['role_tokens']
+
+        actor = row['actor'].replace('\'','')  
+        priority = row['priority']    
+
+        if priority == '':
+            priority = 'NULL'
+        else:
+            priority = int(priority)    
+        
+        is_online = row['is_online']     
+
+        name_tokens_str = tt.tokens_to_str(name_tokens)
+
+        exp_tokens_str = tt.tokens_to_str(exp_tokens)
+
+        role_tokens_str = tt.tokens_to_str(role_tokens)
+
+        diag_id = row['diag_id']
+        ind_id = row['ind_id']
+        if diag_id == '':
+            string_value = '''({},NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                role,
+                role_tokens_str,
+                actor,
+                priority,
+                is_online
+            )
+            values.append(string_value)
+        
+        elif ind_id == '':
+            string_value = '''({},\'{}\',NULL,\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                diag_id, 
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                role,
+                role_tokens_str,
+                actor,
+                priority,
+                is_online
+            )
+            values.append(string_value)
+        else:    
+            string_value = '''({},\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',{},{})'''.format(
+                id,
+                diag_id, 
+                ind_id,
+                name,
+                name_tokens_str,
+                macro,
+                exp,
+                exp_tokens_str,
+                role,
+                role_tokens_str,
+                actor,
+                priority,
+                is_online
+            )
+            values.append(string_value)     
+
+    with open(output_file, 'w') as new_file:
+        for index, value in enumerate(values):
+            if index == 0:
+                print('INSERT INTO country_needs VALUES {},'.format(value), file=new_file)
+            elif index == len(values) - 1:
+                print('''{};'''.format(value), file=new_file)
+            else:
+                print('{},'.format(value), file=new_file)
+

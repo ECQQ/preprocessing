@@ -113,3 +113,19 @@ education_options = [
     'educacion_especial',
     'tecnico_incompleto',
 ]
+
+educ_dict = {
+    'basica_incompleta': 'Educación básica incompleta o inferior',
+    'basica_completa': 'Básica completa',
+    'tecnico_completo' : 'Técnica completa',
+    'universitaria_completa': 'Universitaria completa',
+    'media_incompleta' : 'Media incompleta (incluyendo Media Técnica)',
+    'media_completa' : 'Media completa. Técnica incompleta',
+    'universitaria_incompleta': 'Universitaria incompleta. Técnica completa',
+    'postgrado'  : 'Post Grado (Master, Doctor o equivalente)',
+    'indeterminado' : '',
+    'sin_edu_formal' : '',
+    'tecnico_incompleto': 'Media completa. Técnica incompleta',
+    'educacion_especial' : '',
+    '': ''
+}

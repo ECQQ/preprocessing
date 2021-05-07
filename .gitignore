@@ -1,7 +1,10 @@
 datos
-data/.~lock*
-data/*.xlsx
-data/*.csv
+data/*
+out/*
+db/CSV/*
+db/SQL_INSERT/*
+db/*.zip
+db/*.sql
 __pycache__/
 credentials.json
 token.pickle
