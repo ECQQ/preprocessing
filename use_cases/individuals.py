@@ -18,6 +18,24 @@ educ_dic = {
     'nr': ''
 }
 
+abreviation_dict = {
+    'Media incompleta (incluyendo Media Técnica).': 'MedInc',
+    'Básica completa': 'BasComp',
+    'Básica completa.': 'BasComp',
+    'Educación básica incompleta o inferior': 'BasInc',
+    'Universitaria incompleta. Técnica completa': 'UniInc/TecComp',
+    'Post Grado (Master, Doctor o equivalente)': 'Postg',
+    '28': '',
+    'Media completa. Técnica incompleta': 'MedComp/TecInc',
+    'Media completa. Técnica incompleta.': 'MedComp/TecInc',
+    'Universitaria completa.': 'UniComp',
+    'Universitaria completa': 'UniComp',
+    'Universitaria incompleta. Técnica completa.': 'UniInc/TecComp',
+    'Media incompleta (incluyendo Media Técnica)': 'MedInc',
+    'Educación básica incompleta o inferior.': 'BasInc',
+    'Técnica completa': 'TecComp'
+}
+
 def format_date(x, col):
     try:
         if x[col] == 'nr':
@@ -100,7 +118,8 @@ def create_table_individuals(online_survey, digi_survey, filter_digitilized_indi
     digi['online'] = False
     digi['is_valid'] = digi['is_valid'].apply(lambda x: bool(x))
 
-
     concat = pd.concat([digi, online]).reset_index().iloc[:, 1:]
+
+    concat['level'] = concat['level'].replace(abreviation_dict)
 
     return concat
