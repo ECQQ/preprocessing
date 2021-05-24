@@ -6,7 +6,7 @@ CREATE TABLE propuestas_nna
     topic_perc_contrib float,
     keywords varchar(256),
     text varchar(1024),
-    topico varchar(32),
+    topico varchar(64),
     organizacion varchar(128),
     rango_edades_id varchar(16),
     cantidad_participantes integer,
