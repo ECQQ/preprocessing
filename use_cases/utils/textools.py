@@ -19,6 +19,10 @@ from google.auth.transport.requests import Request
 
 nltk.download('stopwords')
 
+def eliminate_nrs_array(frame, col):
+    frame[col] = frame[col].apply(lambda y: [] if (len(y)==1 and y[0] == 'NR') else y)
+    return frame
+
 def eliminate_nrs(frame):
     frame = frame.replace({
         'nr':'',

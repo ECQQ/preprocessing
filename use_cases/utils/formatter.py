@@ -115,17 +115,17 @@ education_options = [
 ]
 
 educ_dict = {
-    'basica_incompleta': 'Educación básica incompleta o inferior',
-    'basica_completa': 'Básica completa',
-    'tecnico_completo' : 'Técnica completa',
-    'universitaria_completa': 'Universitaria completa',
-    'media_incompleta' : 'Media incompleta (incluyendo Media Técnica)',
-    'media_completa' : 'Media completa. Técnica incompleta',
-    'universitaria_incompleta': 'Universitaria incompleta. Técnica completa',
-    'postgrado'  : 'Post Grado (Master, Doctor o equivalente)',
+    'basica_incompleta': 'BasInc',
+    'basica_completa' : 'BasComp',
+    'tecnico_completo' : 'TecComp',
+    'universitaria_completa': 'UniComp',
+    'media_incompleta' : 'MedInc',
+    'media_completa' : 'MedComp/TecInc',
+    'universitaria_incompleta': 'UniInc/TecComp',
+    'postgrado'  : 'Postg',
     'indeterminado' : '',
     'sin_edu_formal' : '',
-    'tecnico_incompleto': 'Media completa. Técnica incompleta',
+    'tecnico_incompleto': 'MedComp/TecInc',
     'educacion_especial' : '',
     '': ''
 }
